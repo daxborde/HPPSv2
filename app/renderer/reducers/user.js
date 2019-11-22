@@ -9,6 +9,15 @@ export default handleActions(
     [actions.logout]: (state, action) => {
       return { ...state, ...action.payload };
     },
+    [actions.startPy]: (state) => {
+      return {
+        ...state,
+        pythonStatus: true,
+      };
+    },
   },
-  {},
+  {
+    pythonStatus: false,
+    loggedIn: false,
+  },
 );

@@ -12,6 +12,7 @@ const mapDispatchToProps = (dispatch) => {
   const user = bindActionCreators(userActions, dispatch);
   return {
     onLogin: (data) => {
+      user.startPy();
       user.login(data);
       dispatch(push('/loggedin'));
     },

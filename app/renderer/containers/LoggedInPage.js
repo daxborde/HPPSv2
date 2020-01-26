@@ -5,7 +5,7 @@ import LoggedIn from '../components/LoggedIn';
 import userActions from '../actions/user';
 
 const mapStateToProps = (state) => {
-  return state;
+  return { pythonStatus: state.user.pythonStatus };
 };
 
 const mapDispatchToProps = (dispatch) => {
@@ -15,6 +15,7 @@ const mapDispatchToProps = (dispatch) => {
       user.logout(data);
       dispatch(push('/'));
     },
+    startPy: user.startPy,
   };
 };
 

@@ -5,7 +5,10 @@ import LoggedIn from '../components/LoggedIn';
 import userActions from '../actions/user';
 
 const mapStateToProps = (state) => {
-  return { pythonStatus: state.user.pythonStatus };
+  return {
+    pythonStatus: state.user.pythonStatus,
+    username: state.user.username
+  };
 };
 
 const mapDispatchToProps = (dispatch) => {

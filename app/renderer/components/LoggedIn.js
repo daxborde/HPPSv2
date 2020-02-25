@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { PythonShell } from 'python-shell';
+// import { PythonShell } from 'python-shell';
 import PropTypes from 'prop-types';
-const app = require('electron').remote.app
-const path = require('path')
+// const app = require('electron').remote.app
+// const path = require('path')
 // import runMainPy from '../../python/pyrun';
 
 export default class LoggedIn extends Component {

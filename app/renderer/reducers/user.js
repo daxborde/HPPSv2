@@ -8,7 +8,9 @@ const userActions = {
   login: createAction('USER_LOGIN'),
   logout: createAction('USER_LOGOUT'),
   startPy: createAction('START_PYTHON'),
+  startSql: createAction('START_SQL'),
   importCSV: createAction('IMPORT_CSV'),
+  stopSql: createAction('STOP_SQL'),
 };
 
 const reducer = handleActions(
@@ -30,6 +32,7 @@ const reducer = handleActions(
       if (!state.database) {
         console.info("blarg");
         const db = new sqlite3.Database(path.join(remote.app.getPath('userData'), 'db.sqlite3'));
+        // console.warn(path.join(remote.app.getPath('userData'), 'db.sqlite3'));
         return {
           ...state,
           database: db,
@@ -41,6 +44,7 @@ const reducer = handleActions(
       console.info("ligma");
       if (state.database) {
         console.info("uwu");
+        // state.database.close();
         return {
           ...state,
           database: false,

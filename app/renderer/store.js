@@ -3,7 +3,7 @@ import { connectRouter, routerMiddleware, push } from 'connected-react-router';
 import persistState from 'redux-localstorage';
 import thunk from 'redux-thunk';
 
-import { handler as user } from './reducers/user';
+import { reducer as user } from './reducers/user';
 import { userActions } from './reducers/user';
 
 export default function configureStore(initialState, routerHistory) {

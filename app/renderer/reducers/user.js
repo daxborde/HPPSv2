@@ -9,7 +9,7 @@ const userActions = {
   importCSV: createAction('IMPORT_CSV'),
 };
 
-const handler = handleActions(
+const reducer = handleActions(
   {
     [userActions.login]: (state, action) => {
       return { ...state, ...action.payload };
@@ -30,4 +30,4 @@ const handler = handleActions(
   },
 );
 
-export { handler, userActions };
+export { reducer, userActions };

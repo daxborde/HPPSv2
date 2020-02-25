@@ -3,8 +3,8 @@ import { connectRouter, routerMiddleware, push } from 'connected-react-router';
 import persistState from 'redux-localstorage';
 import thunk from 'redux-thunk';
 
-import user from './reducers/user';
-import userActions from './actions/user';
+import { handler as user } from './reducers/user';
+import { userActions } from './reducers/user';
 
 export default function configureStore(initialState, routerHistory) {
   const router = routerMiddleware(routerHistory);
@@ -16,7 +16,7 @@ export default function configureStore(initialState, routerHistory) {
 
   const reducers = {
     router: connectRouter(routerHistory),
-    user,
+    user: user,
   };
 
   const middlewares = [thunk, router];

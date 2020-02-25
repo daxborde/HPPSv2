@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
-import actions from '../../app/renderer/actions/user';
+import { userActions as actions } from '../../app/renderer/reducers/user';
 
 const mockStore = configureMockStore([thunk]);
 

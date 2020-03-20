@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { PythonShell } from 'python-shell';
 import PropTypes from 'prop-types';
-const app = require('electron').remote.app
-const path = require('path')
+
+const app = require('electron').remote.app;
+const path = require('path');
 // import runMainPy from '../../python/pyrun';
 
 export default class LoggedIn extends Component {
@@ -21,7 +22,7 @@ export default class LoggedIn extends Component {
 
   componentDidMount() {
     const runMainPy = () => {
-      console.log("madeit!");
+      console.log('madeit!');
       // var python = require('child_process').spawn('python', ['./main.py']);
       // python.stdout.on('data',function(data){
       //     console.log("data: ",data.toString('utf8'));
@@ -29,7 +30,7 @@ export default class LoggedIn extends Component {
 
       const mypath = path.join(app.getAppPath(), 'python/');
 
-      console.warn("path:"+mypath);
+      console.warn('path:' + mypath);
 
       const options = {
         mode: 'text',
@@ -43,11 +44,11 @@ export default class LoggedIn extends Component {
       });
     };
 
-    console.log("mount!");
+    console.log('mount!');
     if (this.props.pythonStatus) {
-      console.log("status!");
+      console.log('status!');
       runMainPy();
-      console.log("done!");
+      console.log('done!');
     }
   }
 

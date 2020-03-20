@@ -3,6 +3,12 @@ import actions from '../actions/user';
 
 export default handleActions(
   {
+    [actions.createProject]: (state, action) => {
+      return { ...state, ...action.payload };
+    },
+    [actions.selectProject]: (state, action) => {
+      return { ...state, ...action.payload };
+    },
     [actions.login]: (state, action) => {
       return { ...state, ...action.payload };
     },
@@ -19,5 +25,6 @@ export default handleActions(
   {
     pythonStatus: false,
     loggedIn: false,
+    createNewProject: false,
   },
 );

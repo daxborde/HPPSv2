@@ -10,16 +10,16 @@ export default class Login extends Component {
     username: '',
   };
 
+  handleChange = (e) => {
+    this.setState({
+      username: e.target.value,
+    });
+  };
+
   handleLogin = () => {
     this.props.onLogin({
       username: this.state.username,
       loggedIn: true,
-    });
-  };
-
-  handleChange = (e) => {
-    this.setState({
-      username: e.target.value,
     });
   };
 

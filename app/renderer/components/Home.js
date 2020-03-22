@@ -51,6 +51,7 @@ class Home extends Component {
             </Grid>
 
             {/* Open Project */}
+            {/* TODO - Bind action to open & open modal to ask to edit settings */}
             <Grid item>
               <Button
                 className={classes.button}

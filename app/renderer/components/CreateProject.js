@@ -18,6 +18,8 @@ const styles = () => ({
   },
 });
 
+const { dialog } = require('electron').remote;
+
 class CreateProject extends Component {
   static propTypes = {
     onCreateProject: PropTypes.func.isRequired,
@@ -25,39 +27,70 @@ class CreateProject extends Component {
 
   state = {
     projectName: '',
-    excelPath: '',
+    projectPath: '',
+    csvPath: '',
     photosPath: '',
     pixelPad: 0,
   };
 
-  handleProjectName = (event) => {
-    this.setState({
-      projectName: event.target.value,
+  handleProjectPath = () => {
+    const promise = dialog.showOpenDialog({ properties: ['openDirectory'] });
+
+    promise.then((value) => {
+      if (value.canceled) return;
+
+      this.setState({
+        projectPath: value.filePaths[0],
+      });
     });
   };
 
-  handleExcelPath = (event) => {
-    this.setState({
-      excelPath: event.target.value,
+  handleCSVFile = () => {
+    const promise = dialog.showOpenDialog({
+      filters: [{ name: 'CSV', extensions: ['csv'] }],
+      properties: ['openFile'],
+    });
+
+    promise
+      .then((result) => {
+        // console.log(value.filePaths[0]);
+        if (result.canceled) return;
+
+        this.setState({
+          csvPath: result.filePaths[0],
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  handlePhotosPath = () => {
+    const promise = dialog.showOpenDialog({ properties: ['openDirectory'] });
+
+    promise.then((value) => {
+      if (value.canceled) return;
+
+      this.setState({
+        photosPath: value.filePaths[0],
+      });
     });
   };
 
-  handlePhotosPath = (event) => {
-    this.setState({
-      photosPath: event.target.value,
-    });
-  };
+  handleChange = (e) => {
+    const value = e.target.value;
 
-  handlePixelPad = (event) => {
     this.setState({
-      pixelPad: event.target.value,
+      // ...this.state,
+      [e.target.name]: value,
     });
   };
 
   handleClick = () => {
     this.props.onCreateProject({
       projectName: this.state.projectName,
-      excelPath: this.state.excelPath,
+      projectPath: this.state.projectPath,
+      csvPath: this.state.csvPath,
       photosPath: this.state.photosPath,
       pixelPad: this.state.pixelPad,
       createProject: true,
@@ -101,9 +134,11 @@ class CreateProject extends Component {
 
               <Grid item xs={8}>
                 <TextField
-                  label={'Project Name'}
+                  label="Project Name"
+                  name="projectName"
+                  autoFocus={true}
                   InputProps={{ className: classes.input }}
-                  onChange={this.handleProjectName}
+                  onChange={this.handleChange}
                   fullWidth
                   variant="outlined"
                   type={'text'}
@@ -113,40 +148,44 @@ class CreateProject extends Component {
               <Grid item xs={2} />
             </Grid>
 
-            {/* Project Name */}
+            {/* Project Location */}
             <Grid container item justify="center" spacing={2}>
               <Grid item xs={2} />
 
               <Grid item xs={8}>
                 <TextField
-                  label={'Project Location'}
+                  label="Project Location"
+                  name="projectPath"
                   InputProps={{ className: classes.input }}
-                  onChange={this.handleProjectName}
+                  onChange={this.handleChange}
                   fullWidth
                   variant="outlined"
                   type={'text'}
+                  value={this.state.projectPath}
                 />
               </Grid>
 
-              <Grid item xs={2} />
+              <CustomButton content={<FolderOpenIcon />} onClick={this.handleProjectPath} />
             </Grid>
 
-            {/*Excel File*/}
+            {/* CSV File */}
             <Grid container item justify="center" spacing={2}>
               <Grid item xs={2} />
 
               <Grid item xs={8}>
                 <TextField
-                  label={'Excel File'}
+                  label="CSV File"
+                  name="csvPath"
                   InputProps={{ className: classes.input }}
-                  onChange={this.handleExcelPath}
+                  onChange={this.handleChange}
                   fullWidth
                   variant="outlined"
                   type={'text'}
+                  value={this.state.csvPath}
                 />
               </Grid>
 
-              <CustomButton content={<InsertDriveFileIcon />} />
+              <CustomButton content={<InsertDriveFileIcon />} onClick={this.handleCSVFile} />
             </Grid>
 
             {/* Photos Directory */}
@@ -155,17 +194,21 @@ class CreateProject extends Component {
 
               <Grid item xs={8}>
                 <TextField
-                  label={'Photos Folder'}
+                  label="Photos Folder"
+                  name="photosPath"
                   InputProps={{ className: classes.input }}
-                  onChange={this.handlePhotosPath}
+                  onChange={this.handleChange}
                   fullWidth
                   variant="outlined"
                   type={'text'}
+                  value={this.state.photosPath}
                 />
               </Grid>
 
-              <CustomButton content={<FolderOpenIcon />} />
+              <CustomButton content={<FolderOpenIcon />} onClick={this.handlePhotosPath} />
             </Grid>
+
+            {/* TODO - File Rename Pattern */}
 
             {/* Pixel Padding Amount */}
             <Grid container item justify="center" spacing={2}>
@@ -173,12 +216,19 @@ class CreateProject extends Component {
 
               <Grid item xs={8}>
                 <TextField
-                  label={'Pixel Padding Amount'}
+                  label="Pixel Padding Amount"
+                  name="pixelPad"
                   InputProps={{ className: classes.input }}
-                  onChange={this.handlePixelPad}
+                  onChange={(e) => {
+                    // ensure only positive value is entered
+                    if (e.target.value < 0) {
+                      e.target.value = '0';
+                      this.handleChange(e);
+                    }
+                  }}
                   fullWidth
                   variant="outlined"
-                  type={'number'}
+                  type="number"
                 />
               </Grid>
 

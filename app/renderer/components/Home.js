@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Container, Grid, withStyles } from '@material-ui/core';
+import { Button, Container, Grid } from '@material-ui/core';
+import { withStyles } from '@material-ui/core/styles';
 import Template from './Template';
 import FiberNewIcon from '@material-ui/icons/FiberNew';
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
@@ -14,6 +15,7 @@ const styles = () => ({
     transform: 'translate(-50%, -50%)',
   },
   button: {
+    height: 50,
     minWidth: '200px',
   },
 });
@@ -33,7 +35,7 @@ class Home extends Component {
     const { classes } = this.props;
 
     return (
-      <Template>
+      <Template title="Start Menu">
         {/* Buttons */}
         <Container className={classes.content} maxWidth="md">
           <Grid container direction="column" alignItems="center" justify="center" spacing={4}>
@@ -64,9 +66,6 @@ class Home extends Component {
             </Grid>
           </Grid>
         </Container>
-
-        {/*<input onChange={this.handleChange} type="text" value={this.state.username} />*/}
-        {/*<button onClick={this.handleLogin}>Log In</button>*/}
       </Template>
     );
   }

@@ -1,22 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Container, Grid, TextField, withStyles } from '@material-ui/core';
+import { Container, Grid } from '@material-ui/core';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
 import Template from './Template';
-
-const styles = () => ({
-  content: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    // marginRight: '-50%',
-    transform: 'translate(-50%, -50%)',
-  },
-  input: {
-    height: 50,
-  },
-});
+import CustomTextField from './CustomTextField';
+import CustomButton from './CustomButton';
 
 const { dialog } = require('electron').remote;
 
@@ -30,7 +19,7 @@ class CreateProject extends Component {
     projectPath: '',
     csvPath: '',
     photosPath: '',
-    pixelPad: 0,
+    pixelPad: '0',
   };
 
   handleProjectPath = () => {
@@ -78,15 +67,28 @@ class CreateProject extends Component {
   };
 
   handleChange = (e) => {
-    const value = e.target.value;
+    const { name, value } = e.target;
 
     this.setState({
-      // ...this.state,
-      [e.target.name]: value,
+      [name]: value,
     });
   };
 
-  handleClick = () => {
+  validate = () => {
+    const requiredFields = ['projectName', 'projectPath', 'csvPath', 'photosPath', 'pixelPad'];
+
+    let error = false;
+    requiredFields.forEach((key) => {
+      console.log(this.state[key]);
+      if (this.state[key] === '') error = true;
+    });
+
+    return error;
+  };
+
+  handleSubmit = () => {
+    // if (this.validate()) return;
+
     this.props.onCreateProject({
       projectName: this.state.projectName,
       projectPath: this.state.projectPath,
@@ -98,154 +100,119 @@ class CreateProject extends Component {
   };
 
   render() {
-    const { classes } = this.props;
-
-    const CustomButton = (props) => {
-      if (!props.onClick) {
-        return (
-          <Grid item xs={2}>
-            <Button className={classes.input} variant="contained" color="primary">
-              {props.content}
-            </Button>
-          </Grid>
-        );
-      }
-
-      return (
-        <Grid item xs={2}>
-          <Button
-            className={classes.input}
-            onClick={props.onClick}
-            variant="contained"
-            color="primary">
-            {props.content}
-          </Button>
-        </Grid>
-      );
-    };
-
     return (
-      <Template>
-        <Container className={classes.content}>
-          <Grid container direction="column" justify="center" alignItems="center" spacing={4}>
-            {/* Project Name */}
-            <Grid container item justify="center" spacing={2}>
-              <Grid item xs={2} />
-
-              <Grid item xs={8}>
-                <TextField
-                  label="Project Name"
-                  name="projectName"
-                  autoFocus={true}
-                  InputProps={{ className: classes.input }}
-                  onChange={this.handleChange}
-                  fullWidth
-                  variant="outlined"
-                  type={'text'}
-                />
+      <Template title="Create Project">
+        <Container>
+          <form>
+            <Grid container direction="column" justify="center" alignItems="center" spacing={4}>
+              {/* Project Name */}
+              <Grid container item justify="center" spacing={2}>
+                <Grid item xs={8}>
+                  <CustomTextField
+                    label="Project Name"
+                    name="projectName"
+                    type={'text'}
+                    value={this.state.projectName}
+                    autoFocus={true}
+                    onChange={this.handleChange}
+                  />
+                </Grid>
               </Grid>
 
-              <Grid item xs={2} />
-            </Grid>
+              {/* Project Location */}
+              <Grid container item justify="center" spacing={2}>
+                <Grid item xs={2} />
 
-            {/* Project Location */}
-            <Grid container item justify="center" spacing={2}>
-              <Grid item xs={2} />
+                <Grid item xs={8}>
+                  <CustomTextField
+                    label="Project Location"
+                    name="projectPath"
+                    type={'text'}
+                    value={this.state.projectPath}
+                    onChange={this.handleChange}
+                  />
+                </Grid>
 
-              <Grid item xs={8}>
-                <TextField
-                  label="Project Location"
-                  name="projectPath"
-                  InputProps={{ className: classes.input }}
-                  onChange={this.handleChange}
-                  fullWidth
-                  variant="outlined"
-                  type={'text'}
-                  value={this.state.projectPath}
-                />
+                <Grid item xs={2}>
+                  <CustomButton onClick={this.handleProjectPath}>
+                    <FolderOpenIcon />
+                  </CustomButton>
+                </Grid>
               </Grid>
 
-              <CustomButton content={<FolderOpenIcon />} onClick={this.handleProjectPath} />
-            </Grid>
+              {/* CSV File */}
+              <Grid container item justify="center" spacing={2}>
+                <Grid item xs={2} />
 
-            {/* CSV File */}
-            <Grid container item justify="center" spacing={2}>
-              <Grid item xs={2} />
+                <Grid item xs={8}>
+                  <CustomTextField
+                    label="CSV File"
+                    name="csvPath"
+                    type={'text'}
+                    value={this.state.csvPath}
+                    onChange={this.handleChange}
+                  />
+                </Grid>
 
-              <Grid item xs={8}>
-                <TextField
-                  label="CSV File"
-                  name="csvPath"
-                  InputProps={{ className: classes.input }}
-                  onChange={this.handleChange}
-                  fullWidth
-                  variant="outlined"
-                  type={'text'}
-                  value={this.state.csvPath}
-                />
+                <Grid item xs={2}>
+                  <CustomButton onClick={this.handleCSVFile}>
+                    <InsertDriveFileIcon />
+                  </CustomButton>
+                </Grid>
               </Grid>
 
-              <CustomButton content={<InsertDriveFileIcon />} onClick={this.handleCSVFile} />
-            </Grid>
+              {/* Photos Directory */}
+              <Grid container item justify="center" spacing={2}>
+                <Grid item xs={2} />
 
-            {/* Photos Directory */}
-            <Grid container item justify="center" spacing={2}>
-              <Grid item xs={2} />
+                <Grid item xs={8}>
+                  <CustomTextField
+                    label="Photos Folder"
+                    name="photosPath"
+                    type={'text'}
+                    value={this.state.photosPath}
+                    onChange={this.handleChange}
+                  />
+                </Grid>
 
-              <Grid item xs={8}>
-                <TextField
-                  label="Photos Folder"
-                  name="photosPath"
-                  InputProps={{ className: classes.input }}
-                  onChange={this.handleChange}
-                  fullWidth
-                  variant="outlined"
-                  type={'text'}
-                  value={this.state.photosPath}
-                />
+                <Grid item xs={2}>
+                  <CustomButton onClick={this.handlePhotosPath}>
+                    <FolderOpenIcon />
+                  </CustomButton>
+                </Grid>
               </Grid>
 
-              <CustomButton content={<FolderOpenIcon />} onClick={this.handlePhotosPath} />
-            </Grid>
+              {/* TODO - File Rename Pattern */}
 
-            {/* TODO - File Rename Pattern */}
+              {/* Pixel Padding Amount */}
+              <Grid container item justify="center" spacing={2}>
+                <Grid item xs={8}>
+                  <CustomTextField
+                    label="Pixel Padding Amount"
+                    name="pixelPad"
+                    type="number"
+                    onChange={(e) => {
+                      // ensure only positive value is entered
+                      if (e.target.value < 0) {
+                        e.target.value = 0;
+                      }
 
-            {/* Pixel Padding Amount */}
-            <Grid container item justify="center" spacing={2}>
-              <Grid item xs={2} />
-
-              <Grid item xs={8}>
-                <TextField
-                  label="Pixel Padding Amount"
-                  name="pixelPad"
-                  InputProps={{ className: classes.input }}
-                  onChange={(e) => {
-                    // ensure only positive value is entered
-                    if (e.target.value < 0) {
-                      e.target.value = '0';
                       this.handleChange(e);
-                    }
-                  }}
-                  fullWidth
-                  variant="outlined"
-                  type="number"
-                />
+                    }}
+                  />
+                </Grid>
               </Grid>
 
-              <Grid item xs={2} />
+              {/* Finish Button */}
+              <Grid container item justify="center">
+                <CustomButton onClick={this.handleSubmit}>Finish</CustomButton>
+              </Grid>
             </Grid>
-
-            {/* Finish Button */}
-            <Grid container item justify="center">
-              <Grid item xs={2} />
-              <CustomButton content={'Finish'} onClick={this.handleClick} />
-              <Grid item xs={2} />
-            </Grid>
-          </Grid>
+          </form>
         </Container>
       </Template>
     );
   }
 }
 
-export default withStyles(styles, { withTheme: true })(CreateProject);
+export default CreateProject;

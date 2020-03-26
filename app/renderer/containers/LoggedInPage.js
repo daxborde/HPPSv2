@@ -2,10 +2,13 @@ import { connect } from 'react-redux';
 import { push } from 'connected-react-router';
 import { bindActionCreators } from 'redux';
 import LoggedIn from '../components/LoggedIn';
-import userActions from '../actions/user';
+import { userActions } from '../reducers/user';
 
 const mapStateToProps = (state) => {
-  return { pythonStatus: state.user.pythonStatus };
+  return {
+    pythonStatus: state.user.pythonStatus,
+    username: state.user.username
+  };
 };
 
 const mapDispatchToProps = (dispatch) => {

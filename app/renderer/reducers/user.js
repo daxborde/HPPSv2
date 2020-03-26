@@ -1,21 +1,30 @@
-import { handleActions } from 'redux-actions';
-import actions from '../actions/user';
+import { createAction, handleActions } from 'redux-actions';
+// import actions from '../actions/user';
 
-export default handleActions(
+const userActions = {
+  login: createAction('USER_LOGIN'),
+  logout: createAction('USER_LOGOUT'),
+  startPy: createAction('START_PYTHON'),
+  importCSV: createAction('IMPORT_CSV'),
+  selectProject: createAction('SELECT_PROJECT'),
+  createProject: createAction('CREATE_PROJECT'),
+};
+
+const reducer = handleActions(
   {
-    [actions.createProject]: (state, action) => {
+    [userActions.createProject]: (state, action) => {
       return { ...state, ...action.payload };
     },
-    [actions.selectProject]: (state, action) => {
+    [userActions.selectProject]: (state, action) => {
       return { ...state, ...action.payload };
     },
-    [actions.login]: (state, action) => {
+    [userActions.login]: (state, action) => {
       return { ...state, ...action.payload };
     },
-    [actions.logout]: (state, action) => {
+    [userActions.logout]: (state, action) => {
       return { ...state, ...action.payload };
     },
-    [actions.startPy]: (state) => {
+    [userActions.startPy]: (state) => {
       return {
         ...state,
         pythonStatus: true,
@@ -25,6 +34,7 @@ export default handleActions(
   {
     pythonStatus: false,
     loggedIn: false,
-    createNewProject: false,
   },
 );
+
+export { reducer, userActions };

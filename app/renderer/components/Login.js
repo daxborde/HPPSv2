@@ -10,6 +10,12 @@ export default class Login extends Component {
     username: '',
   };
 
+  handleChange = (e) => {
+    this.setState({
+      username: e.target.value,
+    });
+  };
+
   handleLogin = () => {
     this.props.onLogin({
       username: this.state.username,
@@ -17,17 +23,11 @@ export default class Login extends Component {
     });
   };
 
-  handleChange = (e) => {
-    this.setState({
-      username: e.target.value,
-    });
-  };
-
   render() {
     return (
       <div>
         <h2>Login</h2>
-        <input onChange={this.handleChange} type="text" value={this.state.username} />
+        <input onChange={this.handleChange} type='text' value={this.state.username} />
         <button onClick={this.handleLogin}>Log In</button>
       </div>
     );

@@ -35,17 +35,17 @@ class Home extends Component {
     const { classes } = this.props;
 
     return (
-      <Template title="Start Menu">
+      <Template title='Start Menu'>
         {/* Buttons */}
-        <Container className={classes.content} maxWidth="md">
-          <Grid container direction="column" alignItems="center" justify="center" spacing={4}>
+        <Container className={classes.content} maxWidth='md'>
+          <Grid container direction='column' alignItems='center' justify='center' spacing={4}>
             {/* Project Name */}
             <Grid item>
               <Button
                 className={classes.button}
                 variant={'contained'}
-                color="primary"
-                size="large"
+                color='primary'
+                size='large'
                 startIcon={<FiberNewIcon />}
                 onClick={this.handleProject}>
                 Create Project
@@ -57,9 +57,9 @@ class Home extends Component {
             <Grid item>
               <Button
                 className={classes.button}
-                variant="contained"
-                color="primary"
-                size="large"
+                variant='contained'
+                color='primary'
+                size='large'
                 startIcon={<FolderOpenIcon />}>
                 Open Project
               </Button>

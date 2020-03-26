@@ -8,14 +8,14 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-function CustomButton(props) {
+const CustomButton = (props) => {
   const classes = useStyles();
 
   return (
-    <Button {...props} className={classes.input} variant="contained" color="primary">
+    <Button {...props} className={classes.input} variant='contained' color='primary'>
       {props.children}
     </Button>
   );
-}
+};
 
 export default CustomButton;

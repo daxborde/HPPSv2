@@ -8,12 +8,12 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-function CustomTextField(props) {
+const CustomTextField = (props) => {
   const classes = useStyles();
 
   return (
-    <TextField {...props} InputProps={{ className: classes.input }} variant="outlined" fullWidth />
+    <TextField {...props} InputProps={{ className: classes.input }} variant='outlined' fullWidth />
   );
-}
+};
 
 export default CustomTextField;

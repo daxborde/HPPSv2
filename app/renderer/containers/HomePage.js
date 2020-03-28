@@ -15,6 +15,9 @@ const mapDispatchToProps = (dispatch) => {
       user.selectProject(data);
       dispatch(push('/new-project'));
     },
+    debugButton: () => {
+      user.importCSV();
+    }
   };
 };
 

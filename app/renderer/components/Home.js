@@ -31,6 +31,7 @@ class Home extends Component {
     this.props.onSelectProject({
       createNew: true,
     });
+
   };
 
   render() {

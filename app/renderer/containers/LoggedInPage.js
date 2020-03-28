@@ -7,7 +7,8 @@ import { userActions } from '../reducers/user';
 const mapStateToProps = (state) => {
   return {
     pythonStatus: state.user.pythonStatus,
-    username: state.user.username
+    username: state.user.username,
+    database: state.user.database
   };
 };
 
@@ -15,6 +16,7 @@ const mapDispatchToProps = (dispatch) => {
   const user = bindActionCreators(userActions, dispatch);
   return {
     onLogout: (data) => {
+      user.stopSql();
       user.logout(data);
       dispatch(push('/'));
     },

@@ -1,8 +1,8 @@
 import { createAction, handleActions } from 'redux-actions';
-import { remote } from "electron";
-import path from "path";
+import sqlite3 from 'sqlite3';
+import path from 'path';
+import { remote } from 'electron'
 import { spawn } from "child_process";
-// import actions from '../actions/user';
 
 const userActions = {
   login: createAction('USER_LOGIN'),
@@ -11,7 +11,10 @@ const userActions = {
   importCSV: createAction('IMPORT_CSV'),
   selectProject: createAction('SELECT_PROJECT'),
   createProject: createAction('CREATE_PROJECT'),
+  startSql: createAction('START_SQL'),
+  stopSql: createAction('STOP_SQL'),
 };
+
 
 const reducer = handleActions(
   {
@@ -48,8 +51,34 @@ const reducer = handleActions(
         CSVStatus: true,
       };
     },
+    [userActions.startSql]: (state) => {
+      console.warn("@"+remote.app.getPath('userData'));
+      if (!state.database) {
+        console.info("blarg");
+        const db = new sqlite3.Database(path.join(remote.app.getPath('userData'), 'db.sqlite3'));
+        // console.warn(path.join(remote.app.getPath('userData'), 'db.sqlite3'));
+        return {
+          ...state,
+          database: db,
+        };
+      }
+      return state;
+    },
+    [userActions.stopSql]: (state) => {
+      console.info("ligma");
+      if (state.database) {
+        console.info("uwu");
+        // state.database.close();
+        return {
+          ...state,
+          database: false,
+        };
+      }
+      return state;
+    },
   },
   {
+    database: false,
     pythonStatus: false,
     loggedIn: false,
     CSVStatus: false,

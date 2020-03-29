@@ -5,12 +5,18 @@ import LoginPage from './containers/LoginPage';
 import LoggedInPage from './containers/LoggedInPage';
 import HomePage from './containers/HomePage';
 import NewProjectPage from './containers/CreateProjectPage';
+import Progress from './containers/ProgressPage';
 
 export default (
   <Switch>
-    <Route exact path="/" component={HomePage} />
-    <Route exact path="/new-project" component={NewProjectPage} />
-    <Route exact path="/login" component={LoginPage} />
-    <Route exact path="/loggedin" component={LoggedInPage} />
+    <Route exact path='/' component={HomePage} />
+    <Route exact path='/new-project' component={NewProjectPage} />
+    <Route exact path='/progress' component={Progress} />
+
+    <Route exact path='/login' component={LoginPage} />
+    <Route exact path='/loggedin' component={LoggedInPage} />
+
+    {/* if page not found, go to Home Page */}
+    <Route component={HomePage} />
   </Switch>
 );

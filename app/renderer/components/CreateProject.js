@@ -76,18 +76,11 @@ class CreateProject extends Component {
 
   validate = () => {
     const requiredFields = ['projectName', 'projectPath', 'csvPath', 'photosPath', 'padSize'];
-
-    let error = false;
-    requiredFields.forEach((key) => {
-      console.log(this.state[key]);
-      if (this.state[key] === '') error = true;
-    });
-
-    return error;
+    return requiredFields.some((key) => this.state[key] === '');
   };
 
   handleSubmit = () => {
-    // if (this.validate()) return;
+    if (this.validate()) return;
 
     this.props.onCreateProject({
       projectName: this.state.projectName,

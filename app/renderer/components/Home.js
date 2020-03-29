@@ -5,7 +5,6 @@ import { withStyles } from '@material-ui/core/styles';
 import Template from './Template';
 import FiberNewIcon from '@material-ui/icons/FiberNew';
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
-import AddIcon from '@material-ui/icons/Add';
 
 const styles = () => ({
   content: {
@@ -24,14 +23,12 @@ const styles = () => ({
 class Home extends Component {
   static propTypes = {
     onSelectProject: PropTypes.func.isRequired,
-    debugButton: PropTypes.func.isRequired
   };
 
   handleProject = () => {
     this.props.onSelectProject({
       createNew: true,
     });
-
   };
 
   render() {
@@ -69,7 +66,7 @@ class Home extends Component {
             </Grid>
 
             { /* Dev testing button */ }
-            <Grid item>
+            {/* <Grid item>
               <Button
                 className={classes.button}
                 variant='contained'
@@ -79,7 +76,7 @@ class Home extends Component {
                 onClick={this.props.debugButton}>
                 Debug Button
               </Button>
-            </Grid>
+            </Grid> */}
           </Grid>
         </Container>
       </Template>

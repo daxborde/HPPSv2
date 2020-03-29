@@ -13,8 +13,8 @@ const mapDispatchToProps = (dispatch) => {
   return {
     onCreateProject: (data) => {
       user.createProject(data);
-      user.importCSV();
       user.startSql();
+      user.importCSV();
       dispatch(push('/progress'));
     },
   };

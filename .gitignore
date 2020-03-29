@@ -279,3 +279,6 @@ $RECYCLE.BIN/
 # End of https://www.gitignore.io/api/node,linux,macos,windows,webstorm,visualstudiocode
 
 extra-resources/csv_to_sqlite/*
+python/__pycache__
+python/csv_to_sqlite.spec
+.vscode/

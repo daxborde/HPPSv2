@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import { push } from 'connected-react-router';
 import { bindActionCreators } from 'redux';
-import NewProject from '../components/CreateProject';
+import Progress from '../components/Progress';
 import { userActions } from '../reducers/user';
 
 const mapStateToProps = (state) => {
@@ -11,11 +11,10 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   const user = bindActionCreators(userActions, dispatch);
   return {
-    onCreateProject: (data) => {
-      user.createProject(data);
-      user.startSql();
-      user.importCSV();
-      dispatch(push('/progress'));
+    onProgress: (data) => {
+      user.progress(data);
+      // user.stopSql();
+      dispatch(push('/'));
     },
   };
 };
@@ -23,4 +22,4 @@ const mapDispatchToProps = (dispatch) => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(NewProject);
+)(Progress);

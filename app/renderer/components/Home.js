@@ -64,6 +64,19 @@ class Home extends Component {
                 Open Project
               </Button>
             </Grid>
+
+            { /* Dev testing button */ }
+            {/* <Grid item>
+              <Button
+                className={classes.button}
+                variant='contained'
+                color='primary'
+                size='large'
+                startIcon={<AddIcon />}
+                onClick={this.props.debugButton}>
+                Debug Button
+              </Button>
+            </Grid> */}
           </Grid>
         </Container>
       </Template>

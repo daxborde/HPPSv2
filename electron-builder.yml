@@ -16,6 +16,7 @@ files:
 
 extraResources:
   - "python/"
+  - "extra-resources/"
 
 dmg:
   contents:

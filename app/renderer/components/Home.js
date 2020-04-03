@@ -29,6 +29,7 @@ class Home extends Component {
     this.props.onSelectProject({
       createNew: true,
     });
+    this.props.debugButton();
   };
 
   render() {

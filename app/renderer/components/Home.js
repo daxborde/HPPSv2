@@ -33,7 +33,6 @@ class Home extends Component {
 
   render() {
     const { classes } = this.props;
-
     return (
       <Template title='Start Menu'>
         {/* Buttons */}

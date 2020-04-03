@@ -48,7 +48,7 @@ const reducer = handleActions(
       };
     },
     [userActions.importCSV]: (state) => {
-      const programpath = path.join(remote.app.getAppPath(), 'python', 'dist', 'csv_to_sqlite');
+      const programpath = path.join(remote.app.getAppPath(), 'python', 'dist', 'csv_to_sqlite', 'csv_to_sqlite');
       console.log('ap = ' + programpath);
       const csvPath = state.csvPath;
       const dbPath = state.database.filename;

@@ -29,12 +29,10 @@ class Home extends Component {
     this.props.onSelectProject({
       createNew: true,
     });
-    this.props.debugButton();
   };
 
   render() {
     const { classes } = this.props;
-
     return (
       <Template title='Start Menu'>
         {/* Buttons */}

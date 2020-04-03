@@ -48,7 +48,7 @@ const reducer = handleActions(
       };
     },
     [userActions.importCSV]: (state) => {
-      const programpath = path.join(remote.app.getAppPath(), 'python', 'dist', 'csv_to_sqlite');
+      const programpath = path.join(remote.app.getAppPath(), 'python', 'dist', 'csv_to_sqlite', 'csv_to_sqlite');
       console.log('ap = ' + programpath);
       const csvPath = state.csvPath;
       const dbPath = state.database.filename;
@@ -65,23 +65,23 @@ const reducer = handleActions(
 
     [userActions.startSql]: (state) => {
       console.log(remote.app.getPath('userData'));
-      if (!state.database) {
-        console.info('starting db...');
-
-        const db = new sqlite3.Database(
-          path.join(remote.app.getPath('userData'), 'db.sqlite3'),
-          (err) => {
-            if (err) return console.error(err.message);
-            console.info('Connected to the SQlite database');
-          },
-        );
-
-        return {
-          ...state,
-          database: db,
-        };
+      if (state.database) {
+        state.database = false;
       }
-      return state;
+      console.info('starting db...');
+
+      const db = new sqlite3.Database(
+        path.join(state.projectPath, state.projectName+".sqlite3"),
+        (err) => {
+          if (err) return console.error(err.message);
+          console.info('Connected to the SQlite database');
+        },
+      );
+
+      return {
+        ...state,
+        database: db,
+      };
     },
     [userActions.stopSql]: (state) => {
       if (state.database) {

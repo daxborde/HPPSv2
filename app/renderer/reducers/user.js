@@ -12,6 +12,7 @@ const userActions = {
   selectProject: createAction('SELECT_PROJECT'),
   createProject: createAction('CREATE_PROJECT'),
   progress: createAction('SHOW_PROGRESS'),
+  edit: createAction('EDIT_IMAGE'),
 
   // middleware
   startPy: createAction('START_PYTHON'),
@@ -38,6 +39,9 @@ const reducer = handleActions(
       return { ...state, ...action.payload };
     },
     [userActions.progress]: (state, action) => {
+      return { ...state, ...action.payload };
+    },
+    [userActions.edit]: (state, action) => {
       return { ...state, ...action.payload };
     },
 

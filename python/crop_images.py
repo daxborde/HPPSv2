@@ -9,8 +9,6 @@ with redirect_stdout(None):
     from mrcnn.model import mold_image
     from skimage.io import imread as sk_imread
     from skimage.io import imsave as sk_imsave
-    from cv2 import INTER_AREA
-    from cv2 import resize as cv2_resize
     from sqlite3 import connect
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
@@ -38,40 +36,32 @@ def load_model():
 def load_image(file):
     # Load image
     try:
-        orig = sk_imread(file)
+        image = sk_imread(file)
     except:
-        return None, None, None
+        return None
     
-    #resize the image so largest dimension is no more than 500px
-    scale = min(1, 275/amax(orig.shape))
-    width, height = int(orig.shape[0]*scale), int(orig.shape[1]*scale)
-    image = cv2_resize(orig, (height, width), interpolation=INTER_AREA)
-    
-    return image, orig, width/orig.shape[0]    
+    return image   
 
 def predict(image, model, cfg, tol=.995):
     #make a prediction
     result, score = predict_bb(image, model, cfg)
     rotate = 0
-    #check rotations is model is less than half sure on prediction
+    
+    #If the image is dramatically unsure, skip rotations
+    min_tol = max(0, tol-(1-tol)*5)
+    
     #take rotation model is most sure about
-    max_tol = (1-tol)/2 + tol
-    if(result is None or score < max_tol):
-        #No images will be flipped, no need to test
+    if(result is None or (score > min_tol and score < tol)):
+        #No images will be flipped, no need to test 180 rotation
         rotations = [np_rot90(image), np_rot90(image, 3)]
         count = [1,3]
         for rot,c in zip(rotations,count):
             #make the prediction
             result_r, score_r = predict_bb(rot, model, cfg)
-            
-            #replace is model is more sure of this rotation
+            #replace if model is more sure of this rotation
             if(score_r > score):
                 result, score = result_r, score_r
                 rotate = c
-            
-            #return if model is more than half sure of this rotation
-            if(score >= max_tol):
-                break
     return result, rotate
 
 def predict_bb(image, model, cfg, tol=.995):
@@ -86,23 +76,23 @@ def predict_bb(image, model, cfg, tol=.995):
     
     #check accuracy and size
     img_size = image.shape[0] * image.shape[1]
-    result, size, score = None, 0, 0
+    result, size, score_fin = None, 0, 0
     for score, roi in zip(yhat['scores'], yhat['rois']):
         if score > tol:
             y1, x1, y2, x2 = roi
             cur_size = (y2-y1)*(x2-x1)
-            if cur_size/img_size > .1 and (cur_size > size or result is None):
-                result, size, score = roi, cur_size, score
+            if cur_size > size or result is None:
+                result, size, score_fin = roi, cur_size, score
 
-    return result, score
+    return result, score_fin
 
-def crop(image, rect, scale, padding):
+def crop(image, rect, padding):
     y1, x1, y2, x2 = rect
     #scale back up rectangle and add the padding
-    y1 = max(int(y1/scale) - padding, 0)
-    x1 = max(int(x1/scale) - padding, 0)
-    y2 = min(int(y2/scale) + padding, image.shape[0]-1)
-    x2 = min(int(x2/scale) + padding, image.shape[1]-1)
+    y1 = max(y1 - padding, 0)
+    x1 = max(x1 - padding, 0)
+    y2 = min(y2 + padding, image.shape[0]-1)
+    x2 = min(x2 + padding, image.shape[1]-1)
     return image[y1:y2,x1:x2,:]
 
 def log(result_list, db):
@@ -121,7 +111,7 @@ def log(result_list, db):
     conn.commit()
     #close out db
     c.close()
-    
+
 def crop_images(input_dir, output_dir, database, padding=0, logfile="logfile.txt", tol=.995):
     #Load pre-trained model
     with redirect_stdout(None):
@@ -142,16 +132,16 @@ def crop_images(input_dir, output_dir, database, padding=0, logfile="logfile.txt
     result_list = []
     for file in os.listdir(input_dir):
         #load images
-        testing, orig, scale = load_image(ipath(file))
+        image = load_image(ipath(file))
         
         #ensure image loaded correctly, continue if not
-        if(testing is None):
+        if(image is None):
             logger.write(f"{cur_file}/{file_count}: {ipath(file)} not registering as an image, ignoring\n")
             cur_file+=1
             continue
         
-        #predict on testing
-        rect, rotation = predict(testing, model, cfg)
+        #predict on image
+        rect, rotation = predict(image, model, cfg)
         
         #check if we failed
         if rect is None:
@@ -159,11 +149,11 @@ def crop_images(input_dir, output_dir, database, padding=0, logfile="logfile.txt
             result= (ipath(file), ipath(file), 0)
         else:
             #rotate the image
-            orig = np_rot90(orig, rotation)
-            
+            image = np_rot90(image, rotation)
+        
             #crop the image
-            cropped = crop(orig, rect, scale, padding)
-            
+            cropped = crop(image, rect, padding)
+
             #write to cropped dir
             sk_imsave(opath(file),cropped)
             

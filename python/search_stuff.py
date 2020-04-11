@@ -29,7 +29,7 @@ def fuzzy_search(csv_df, query):
 
     whitelist = ascii_letters + ' ' # digits
     trimmed_query = ''.join(c for c in query if c in whitelist)
-    
+
     # remove and use different table
     df = csv_df
     # db = connect(normpath(args.database_path))
@@ -57,13 +57,15 @@ def database_entry(csv_path, database_path, pipeline_results, entry_table):
 
     # new_df = pipeline_df[['crop_path', 'foundidx']]
     # m
-    def eachIdx(i):
-        res = pipeline_df.loc[pipeline_df['foundidx'] == i]['crop_path']
-        if not res.empty:
-            return res.iloc[0]
-        return nan
-    csv_df['filepath'] = csv_df.index.map(eachIdx)
-    csv_df.to_sql(entry_table, db, if_exists='replace')
+    # def eachIdx(i):
+    #     res = pipeline_df.loc[pipeline_df['foundidx'] == i]['crop_path']
+    #     if not res.empty:
+    #         return res.iloc[0]
+    #     return nan
+    # csv_df['filepath'] = csv_df.index.map(eachIdx)
+    result = pipeline_df.merge(csv_df, left_on='foundidx', right_index=True)
+    result.to_sql(entry_table, db, if_exists='replace')
+    return result
 
 
 if __name__ == "__main__":
@@ -80,7 +82,7 @@ if __name__ == "__main__":
     # )
 
     parser.add_argument(
-        "csv_path", 
+        "csv_path",
         # REMOVE DEFAULT VALUE
         # default="C:\\Users\\Dax\\AlexandriaNCData.csv",
         help="Path to a CSV file."

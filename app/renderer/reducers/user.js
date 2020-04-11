@@ -3,6 +3,8 @@ import sqlite3 from 'sqlite3';
 import path from 'path';
 import { remote } from 'electron';
 import { spawn } from 'child_process';
+// import ReduxThunk from 'redux-thunk';
+
 
 const userActions = {
   login: createAction('USER_LOGIN'),
@@ -21,17 +23,23 @@ const userActions = {
   // sql
   startSql: createAction('START_SQL'),
   stopSql: createAction('STOP_SQL'),
+
+  // thunk
+  grabCols: createAction('GET_COLUMNS'),
+
+  // debug
+  resetYaboi: createAction('RESET_YABOI'),
 };
 
 const reducer = handleActions(
   {
+    [userActions.resetYaboi]: () => { return {}; },
     [userActions.login]: (state, action) => {
       return { ...state, ...action.payload };
     },
     [userActions.logout]: (state, action) => {
       return { ...state, ...action.payload };
     },
-
     [userActions.selectProject]: (state, action) => {
       return { ...state, ...action.payload };
     },
@@ -65,6 +73,13 @@ const reducer = handleActions(
         ...state,
         CSVStatus: true,
       };
+    },
+
+    [userActions.grabCols]: (state, action) => {
+      return {
+        ...state,
+        ...action.payload,
+      }
     },
 
     [userActions.startSql]: (state) => {

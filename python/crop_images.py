@@ -1,7 +1,6 @@
 from contextlib import redirect_stdout
 with redirect_stdout(None):
     import sys, os, argparse
-    from datetime import datetime as dt
     from numpy import expand_dims
     from numpy import amax
     from numpy import rot90 as np_rot90
@@ -58,8 +57,9 @@ def predict(image, model, cfg, tol=.995):
     #take rotation model is most sure about
     max_tol = (1-tol)/2 + tol
     if(result is None or score < max_tol):
-        rotations = [np_rot90(image), np_rot90(image, 2), np_rot90(image, 3)]
-        count = [1,2,3]
+        #No images will be flipped, no need to test
+        rotations = [np_rot90(image), np_rot90(image, 3)]
+        count = [1,3]
         for rot,c in zip(rotations,count):
             #make the prediction
             result_r, score_r = predict_bb(rot, model, cfg)
@@ -185,8 +185,7 @@ def crop_images(input_dir, output_dir, database, padding=0, logfile="logfile.txt
 
 if __name__ == "__main__":
     # create default log file name
-    time = str(dt.now()).replace(" ", "_") 
-    logfile = f"log{time[:time.index('.')]}.txt"
+    logfile = "log.txt"
     
     #parse command line arguments
     parser = argparse.ArgumentParser()
@@ -194,7 +193,7 @@ if __name__ == "__main__":
     parser.add_argument('output_dir', type=str, nargs=1)
     parser.add_argument('database', type=str, nargs=1)
     parser.add_argument('--padding', type=int, nargs=1, default=[0])
-    parser.add_argument('--log', type=str, nargs=1, default=logfile)    
+    parser.add_argument('--log', type=str, nargs=1, default=[logfile])    
     args=parser.parse_args()
     
     #ensure paths are absolute and padding is > 0
@@ -206,3 +205,4 @@ if __name__ == "__main__":
     
     # run script
     crop_images(_input_dir, _output_dir, _database, padding=_padding, logfile=_log)
+

@@ -27,18 +27,40 @@ def fuzzy_search(csv_df, query):
     """ Fuzzy search for entry in CSV """
     # print(f"q={query}")
 
-    whitelist = ascii_letters + ' ' # digits
+    if not query:
+        return 0
+
+    whitelist = ascii_letters + ' ' + digits
     trimmed_query = ''.join(c for c in query if c in whitelist)
+    arr = trimmed_query.upper().split()
+
+    flat = set()
+
+    for colname in csv_df.columns[0:3]:
+        yaboi = [ (process.extract(s, csv_df[colname], scorer=fuzz.token_set_ratio, limit=len(csv_df))) for s in arr ]
+        minh = [ [ x[2] for x in resrow if x[1] == 100 ] for resrow in yaboi ]
+        flat.update([ j for sub in minh for j in sub ])
 
     # remove and use different table
-    df = csv_df
+    if len(flat) == 1:
+        return list(flat)[0]
+
+    if len(flat) == 0:
+        df = csv_df
+    else:
+        df = csv_df.iloc[list(flat)]
+
+    # if "STEWART" in trimmed_query.upper():
+    #     print("-----------------------------------")
+    #     print(df)
+
     # db = connect(normpath(args.database_path))
     # df.to_sql(args.table_name, db, if_exists='replace')
 
     # print(df.columns)
     # choices = df['Surname'].unique()
     # print(choices)
-    possible = process.extract(trimmed_query, df['combined'], scorer=fuzz.token_sort_ratio, limit=1)
+    possible = process.extract(trimmed_query, df['combined'], scorer=fuzz.token_set_ratio, limit=1)
     # print(f"p={possible}")
     return possible[0][2]
 
@@ -47,13 +69,15 @@ def database_entry(csv_path, database_path, pipeline_results, entry_table):
     pipeline_df = read_sql_query(f"SELECT * FROM {pipeline_results}", db)
     csv_df = read_csv(normpath(csv_path))
 
-    csv_df['combined'] = csv_df[csv_df.columns[0:6]].apply(
+    csv_df['combined'] = csv_df[csv_df.columns[0:5]].apply(
         lambda x: ' '.join(x.dropna().astype(str)),
         axis=1
     )
 
     eachResult = lambda p: fuzzy_search(csv_df, p[0])
     pipeline_df['foundidx'] = pipeline_df[['ocr_results']].apply(eachResult, axis=1)
+
+
 
     # new_df = pipeline_df[['crop_path', 'foundidx']]
     # m

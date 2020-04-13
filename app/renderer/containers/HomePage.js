@@ -14,8 +14,8 @@ const mapDispatchToProps = (dispatch) => {
     onSelectProject: (data) => {
       user.selectProject(data);
       dispatch(push('/new-project'));
-      user.startSql();
-      user.importCSV();
+      // user.startSql();
+      // user.importCSV();
     }
   };
 };

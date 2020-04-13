@@ -121,6 +121,10 @@ def crop_images(input_dir, output_dir, database, padding=0, logfile="logfile.txt
     ipath = lambda x : os.path.join(input_dir, x)
     opath = lambda x : os.path.join(output_dir, x)
     
+    #add failure path
+    os.mkdir(os.path.join(output_dir, "failures"))
+    failpath = lambda x : os.path.join(output_dir,"failures", x)
+    
     #intialize counters
     file_count = len(os.listdir(input_dir))
     cur_file = 1
@@ -146,7 +150,8 @@ def crop_images(input_dir, output_dir, database, padding=0, logfile="logfile.txt
         #check if we failed
         if rect is None:
             #failure
-            result= (ipath(file), ipath(file), 0)
+            sk_imsave(failpath(file),image)
+            result= (ipath(file), failpath(file), 0)
         else:
             #rotate the image
             image = np_rot90(image, rotation)
@@ -195,4 +200,3 @@ if __name__ == "__main__":
     
     # run script
     crop_images(_input_dir, _output_dir, _database, padding=_padding, logfile=_log)
-

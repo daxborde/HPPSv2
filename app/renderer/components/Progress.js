@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Button, Card, CardContent, LinearProgress, Typography } from '@material-ui/core';
 import Container from '@material-ui/core/Container';
 import Template from './Template';
+import sqlite3 from 'sqlite3';
 
 class Progress extends Component {
   static propTypes = {
@@ -24,6 +25,22 @@ class Progress extends Component {
       loggedIn: true,
     });
   };
+
+  componentDidMount() {
+    const db = new sqlite3.Database(this.props.dbPath, () => {
+      db.all("PRAGMA table_info(CSVData);", (err, rows) => {
+        const colnames = rows.map((x) => x.name);
+        console.log("yaboi:"+colnames);
+        this.props.grabCols({
+          csvCols: colnames
+        });
+      });
+    });
+
+    // const mycolnames = await database_actions;
+
+    // console.log(mycolnames);
+  }
 
   render() {
     return (

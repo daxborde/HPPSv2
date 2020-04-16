@@ -1,8 +1,22 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Card, CardContent, LinearProgress, Typography } from '@material-ui/core';
-import Container from '@material-ui/core/Container';
 import Template from './Template';
+import { withStyles } from '@material-ui/core/styles';
+
+const styles = (theme) => ({
+  card: {
+    width: '50vw',
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    padding: theme.spacing(2),
+  },
+  progress: {
+    marginTop: theme.spacing(4),
+  },
+});
 
 class Progress extends Component {
   static propTypes = {
@@ -26,24 +40,24 @@ class Progress extends Component {
   };
 
   render() {
+    const { classes } = this.props;
+
     return (
       <Template title='Progress'>
-        <Container>
-          <Card>
-            <CardContent>
-              <Typography variant='h5'>Please wait...</Typography>
-              <span />
-              <LinearProgress />
+        <Card className={classes.card}>
+          <CardContent>
+            <Typography variant='h5'>Please wait...</Typography>
 
-              <Button variant='outlined' onClick={this.handleProgress}>
-                home
-              </Button>
-            </CardContent>
-          </Card>
-        </Container>
+            <Button variant='outlined' onClick={this.handleProgress}>
+              DEBUG_NEXT
+            </Button>
+
+            <LinearProgress className={classes.progress} />
+          </CardContent>
+        </Card>
       </Template>
     );
   }
 }
 
-export default Progress;
+export default withStyles(styles, { withTheme: true })(Progress);

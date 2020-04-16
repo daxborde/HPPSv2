@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Container, Grid } from '@material-ui/core';
+import { Container, Fab, Grid } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import Template from './Template';
 import FiberNewIcon from '@material-ui/icons/FiberNew';
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
 
-const styles = () => ({
+const styles = (theme) => ({
   content: {
     position: 'absolute',
     top: '50%',
@@ -17,6 +17,9 @@ const styles = () => ({
   button: {
     height: 50,
     minWidth: '200px',
+  },
+  extendedIcon: {
+    marginRight: theme.spacing(1),
   },
 });
 
@@ -40,42 +43,24 @@ class Home extends Component {
           <Grid container direction='column' alignItems='center' justify='center' spacing={4}>
             {/* Project Name */}
             <Grid item>
-              <Button
+              <Fab
                 className={classes.button}
-                variant={'contained'}
+                variant='extended'
                 color='primary'
-                size='large'
-                startIcon={<FiberNewIcon />}
                 onClick={this.handleProject}>
+                <FiberNewIcon className={classes.extendedIcon} />
                 Create Project
-              </Button>
+              </Fab>
             </Grid>
 
             {/* Open Project */}
             {/* TODO - Bind action to open & open modal to ask to edit settings */}
             <Grid item>
-              <Button
-                className={classes.button}
-                variant='contained'
-                color='primary'
-                size='large'
-                startIcon={<FolderOpenIcon />}>
+              <Fab className={classes.button} variant='extended' color='default'>
+                <FolderOpenIcon className={classes.extendedIcon} />
                 Open Project
-              </Button>
+              </Fab>
             </Grid>
-
-            { /* Dev testing button */ }
-            {/* <Grid item>
-              <Button
-                className={classes.button}
-                variant='contained'
-                color='primary'
-                size='large'
-                startIcon={<AddIcon />}
-                onClick={this.props.debugButton}>
-                Debug Button
-              </Button>
-            </Grid> */}
           </Grid>
         </Container>
       </Template>

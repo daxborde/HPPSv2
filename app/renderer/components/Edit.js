@@ -5,30 +5,31 @@ import CustomTextField from './CustomTextField';
 import CustomButton from './CustomButton';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
+import Card from '@material-ui/core/Card';
 
 const styles = (theme) => ({
   wrapper: {
     display: 'flex',
     margin: theme.spacing(0, 4, 0, 3),
+    justifyContent: 'space-between',
   },
   photo: {
     flex: '45%',
     display: 'flex',
     justifyContent: 'center',
-    alignItems: 'flex-start',
+    alignSelf: 'flex-start',
     // background: 'red',
   },
   img: {
-    // position: 'relative',
-    // maxWidth: '100%',
-    height: '85vh',
-
-    // height: 'auto',
+    position: 'sticky',
+    height: 'calc(85vh)',
+    objectFit: 'cover',
   },
   form: {
     display: 'flex',
     flexDirection: 'column',
     flex: '55%',
+    padding: theme.spacing(4, 2, 4, 2),
     // background: 'green',
   },
   buttons: {
@@ -65,9 +66,14 @@ class Edit extends Component {
       <Template title='Edit'>
         <div className={classes.wrapper}>
           <div key={this.props.imgPath} className={classes.photo}>
-            <img alt='headstone' className={classes.img} src={this.props.imgPath} />
+            <Card
+              component='img'
+              alt='headstone'
+              className={classes.img}
+              src={this.props.imgPath}
+            />
           </div>
-          <div className={classes.form}>
+          <Card className={classes.form}>
             <div key={this.props.index}>{list(this.props.colNames)}</div>
 
             <div className={classes.buttons}>
@@ -78,7 +84,7 @@ class Edit extends Component {
                 <NavigateNextIcon />
               </CustomButton>
             </div>
-          </div>
+          </Card>
         </div>
       </Template>
     );

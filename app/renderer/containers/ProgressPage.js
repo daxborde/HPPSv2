@@ -5,14 +5,23 @@ import Progress from '../components/Progress';
 import { userActions } from '../reducers/user';
 
 const mapStateToProps = (state) => {
-  return state;
+  return {
+    // ...state
+    dbPath: state.user.database.filename,
+    photosPath: state.user.photosPath,
+    projectPath: state.user.projectPath,
+  };
 };
 
 const mapDispatchToProps = (dispatch) => {
   const user = bindActionCreators(userActions, dispatch);
   return {
+    grabCols: (cols) => {
+      user.grabCols(cols);
+    },
     onProgress: (data) => {
       user.progress(data);
+      // user.stopSql();
       dispatch(push('/edit'));
     },
   };

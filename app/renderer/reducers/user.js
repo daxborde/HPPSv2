@@ -41,6 +41,7 @@ const reducer = handleActions(
     [userActions.logout]: (state, action) => {
       return { ...state, ...action.payload };
     },
+
     [userActions.selectProject]: (state, action) => {
       return { ...state, ...action.payload };
     },

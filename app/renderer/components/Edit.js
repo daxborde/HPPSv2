@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import Template from './Template';
 import { withStyles } from '@material-ui/core/styles';
 import CustomTextField from './CustomTextField';
 import CustomButton from './CustomButton';
+import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
+import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 
 const styles = (theme) => ({
   wrapper: {
@@ -12,17 +13,23 @@ const styles = (theme) => ({
   },
   photo: {
     flex: '45%',
-    background: 'red',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    // background: 'red',
   },
-  // img: {
-  //   display: block,
-  //   maxWidth: 100%,
-  // },
+  img: {
+    // position: 'relative',
+    // maxWidth: '100%',
+    height: '85vh',
+
+    // height: 'auto',
+  },
   form: {
     display: 'flex',
     flexDirection: 'column',
     flex: '55%',
-    background: 'green',
+    // background: 'green',
   },
   buttons: {
     display: 'flex',
@@ -30,61 +37,46 @@ const styles = (theme) => ({
     justifyContent: 'flex-end',
   },
   item: {
-    marginTop: theme.spacing(3),
+    marginBottom: theme.spacing(3),
   },
 });
 
 class Edit extends Component {
-  static propTypes = {
-    onEdit: PropTypes.func.isRequired,
-  };
-
-  state = {
-    imagePath: '',
-    data: [['first', 'john'], ['middle', 'e'], ['last', 'doe']],
-  };
-
-  handleChange = (e) => {
-    const { name, value } = e.target;
-
-    this.setState({
-      [name]: value,
-    });
-  };
-
-  handleEdit = () => {
-    this.props.onEdit({
-      data: this.state.data,
-    });
-  };
-
   render() {
     const { classes } = this.props;
-    const foo = this.state.data.map((x, index) => (
-      <CustomTextField
-        key={index}
-        label={x[0]}
-        name={x[0]}
-        type='text'
-        defaultValue={x[1]}
-        className={classes.item}
-        onBlur={this.handleChange}
-      />
-    ));
+
+    const list = (x) => {
+      if (x === null) return null;
+
+      return x.map((x, index) => (
+        <CustomTextField
+          key={index}
+          label={x}
+          name={x}
+          type='text'
+          defaultValue={this.props[x]}
+          className={classes.item}
+          onBlur={this.props.handleChange}
+        />
+      ));
+    };
 
     return (
       <Template title='Edit'>
-        {/*<div className={classes.wrapper}>*/}
         <div className={classes.wrapper}>
-          <div className={classes.photo}>
-            <img src={this.state.imagePath} />
+          <div key={this.props.imgPath} className={classes.photo}>
+            <img alt='headstone' className={classes.img} src={this.props.imgPath} />
           </div>
           <div className={classes.form}>
-            {foo}
+            <div key={this.props.index}>{list(this.props.colNames)}</div>
 
             <div className={classes.buttons}>
-              <CustomButton onClick={this.handleEdit}>Previous</CustomButton>
-              <CustomButton onClick={this.handleEdit}>Next</CustomButton>
+              <CustomButton disabled={this.props.b1} onClick={this.props.onPrevious}>
+                <NavigateBeforeIcon />
+              </CustomButton>
+              <CustomButton disabled={this.props.b2} onClick={this.props.onNext}>
+                <NavigateNextIcon />
+              </CustomButton>
             </div>
           </div>
         </div>

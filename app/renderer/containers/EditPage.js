@@ -1,11 +1,15 @@
 import { connect } from 'react-redux';
 import { push } from 'connected-react-router';
 import { bindActionCreators } from 'redux';
-import Edit from '../components/Edit';
+import EditWrap from '../components/EditWrap';
 import { userActions } from '../reducers/user';
 
 const mapStateToProps = (state) => {
-  return state;
+  return {
+    ...state,
+    csvCols: state.user.csvCols,
+    dbPath: state.user.database.filename,
+  };
 };
 
 const mapDispatchToProps = (dispatch) => {
@@ -14,11 +18,11 @@ const mapDispatchToProps = (dispatch) => {
     onEdit: (data) => {
       user.edit(data);
       dispatch(push('/'));
-    }
+    },
   };
 };
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(Edit);
+)(EditWrap);

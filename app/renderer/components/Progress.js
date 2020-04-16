@@ -33,7 +33,7 @@ class Progress extends Component {
     const db = new sqlite3.Database(this.props.dbPath, () => {
       db.all("PRAGMA table_info(CSVData);", (err, rows) => {
         const colnames = rows.map((x) => x.name);
-        console.log("yaboi:"+colnames);
+        console.log("yaboi:" + colnames);
         this.props.grabCols({
           csvCols: colnames
         });
@@ -42,41 +42,41 @@ class Progress extends Component {
 
     const run_exes = false;
     if (run_exes) {
-    const python_dist = path.join(remote.app.getAppPath(), 'python', 'dist');
-    const exe_names = ['test1', 'test2']
-    const filepaths = exe_names.map((x) => { return path.join(python_dist, x, x) });
-    console.log(`propboi=${this.props.projectPath}`)
+      const python_dist = path.join(remote.app.getAppPath(), 'python', 'dist');
+      const exe_names = ['test1', 'test2']
+      const filepaths = exe_names.map((x) => { return path.join(python_dist, x, x) });
+      console.log(`propboi=${this.props.projectPath}`)
 
-    const crop_process = spawn(filepaths[0],
-      [this.props.photosPath, this.props.projectPath, this.props.dbPath]);
-    crop_process.stdout.on("data", (data) => {
-      console.log(`crop stdout: ${data}`);
-    });
-    crop_process.stderr.on("data", (data) => {
-      console.error(`crop err: ${data}`);
-    });
-    crop_process.on("close", (code) => {
-      if(code !== 0) {
-        console.err("Cropping portion failed.")
-        return;
-      }
-      const ocr_process = spawn(filepaths[1], [this.props.dbPath]);
-      ocr_process.stdout.on("data", (data) => {
-        console.log(`ocr stdout: ${data}`);
+      const crop_process = spawn(filepaths[0],
+        [this.props.photosPath, this.props.projectPath, this.props.dbPath]);
+      crop_process.stdout.on("data", (data) => {
+        console.log(`crop stdout: ${data}`);
       });
-      ocr_process.stderr.on("data", (data) => {
-        console.error(`ocr err: ${data}`);
+      crop_process.stderr.on("data", (data) => {
+        console.error(`crop err: ${data}`);
       });
-      ocr_process.on("close", (code) => {
-        if(code !== 0) {
-          console.error("OCR portion failed.")
+      crop_process.on("close", (code) => {
+        if (code !== 0) {
+          console.err("Cropping portion failed.")
           return;
-        } else {
-          console.log("Success!!!!!");
         }
+        const ocr_process = spawn(filepaths[1], [this.props.dbPath]);
+        ocr_process.stdout.on("data", (data) => {
+          console.log(`ocr stdout: ${data}`);
+        });
+        ocr_process.stderr.on("data", (data) => {
+          console.error(`ocr err: ${data}`);
+        });
+        ocr_process.on("close", (code) => {
+          if (code !== 0) {
+            console.error("OCR portion failed.")
+            return;
+          } else {
+            console.log("Success!!!!!");
+          }
+        });
       });
-    });
-  }
+    }
 
     // const mycolnames = await database_actions;
 

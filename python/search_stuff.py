@@ -1,11 +1,12 @@
 from os.path import normpath
 from sqlite3 import connect
 from argparse import ArgumentParser
-from pandas import DataFrame, read_csv, read_sql_query
+from pandas import DataFrame, read_csv, read_sql_query, Series
 # fuzz is used to compare TWO strings
 from fuzzywuzzy import fuzz
 from string import ascii_letters, digits
-from numpy import nan
+from numpy import array as nparray, nan, apply_along_axis, \
+    vectorize, isnan, nonzero
 
 # process is used to compare a string to MULTIPLE other strings
 from fuzzywuzzy import process
@@ -14,9 +15,11 @@ __author__ = "dax"
 __version__ = "0.1.0"
 __license__ = "MIT"
 
+
 # def read_csv(csv_path, database_path, table_name="CSVData"):
 #     """ Read CSV file into SQLite database """
 #     # print(args)
+
 
 #     df = read_csv(normpath(csv_path))
 #     conn = connect(normpath(database_path))
@@ -32,14 +35,32 @@ def fuzzy_search(csv_df, query):
 
     whitelist = ascii_letters + ' ' + digits
     trimmed_query = ''.join(c for c in query if c in whitelist)
-    arr = trimmed_query.upper().split()
+    split_query = nparray(trimmed_query.upper().split())
 
-    flat = set()
+    flat = []
 
-    for colname in csv_df.columns[0:3]:
-        yaboi = [ (process.extract(s, csv_df[colname], scorer=fuzz.token_set_ratio, limit=len(csv_df))) for s in arr ]
-        minh = [ [ x[2] for x in resrow if x[1] == 100 ] for resrow in yaboi ]
-        flat.update([ j for sub in minh for j in sub ])
+    limit = max(len(csv_df)//2, 20)
+
+    def eachQuery(s, column, limit):
+        fuzz_results = nparray(process.extract(s, column, scorer=fuzz.token_set_ratio, limit=1), dtype='O')
+
+        # Only take exact matches
+        if fuzz_results[0][1] != 100:
+            return nparray([])
+
+        fuzz_first = fuzz_results[0][0]
+        # reduce_results = nparray([x[0] if x[1] == 100 else nan for x in fuzz_results], dtype='U')
+        return nonzero(column == fuzz_first)[0]
+
+    def eachCol(column, split_query, limit):
+        scolumn = Series(column)
+        fuzzy_locs = nparray([eachQuery(s, column, limit) for s in split_query])
+        # idx_results = series_results.map(lambda resrow: resrow.map(lambda x: ) )
+        flat.extend([j for sub in fuzzy_locs for j in sub])
+        print("", end="")
+
+    # This and the two methods above search for exact matches
+    apply_along_axis(eachCol, 0, csv_df[csv_df.columns[0:3]].to_numpy(dtype='U'), split_query, limit)
 
     # remove and use different table
     if len(flat) == 1:

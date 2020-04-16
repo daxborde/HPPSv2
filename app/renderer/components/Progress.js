@@ -1,12 +1,26 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Card, CardContent, LinearProgress, Typography } from '@material-ui/core';
-import Container from '@material-ui/core/Container';
 import Template from './Template';
+import { withStyles } from '@material-ui/core/styles';
 import sqlite3 from 'sqlite3';
 import { spawn } from 'child_process';
 import path from 'path';
 import { remote } from 'electron';
+
+const styles = (theme) => ({
+  card: {
+    width: '50vw',
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    padding: theme.spacing(2),
+  },
+  progress: {
+    marginTop: theme.spacing(4),
+  },
+});
 
 class Progress extends Component {
   static propTypes = {
@@ -31,11 +45,11 @@ class Progress extends Component {
 
   componentDidMount() {
     const db = new sqlite3.Database(this.props.dbPath, () => {
-      db.all("PRAGMA table_info(CSVData);", (err, rows) => {
+      db.all('PRAGMA table_info(CSVData);', (err, rows) => {
         const colnames = rows.map((x) => x.name);
-        console.log("yaboi:" + colnames);
+        console.log('yaboi:' + colnames);
         this.props.grabCols({
-          csvCols: colnames
+          csvCols: colnames,
         });
       });
     });
@@ -43,37 +57,42 @@ class Progress extends Component {
     const run_exes = false;
     if (run_exes) {
       const python_dist = path.join(remote.app.getAppPath(), 'python', 'dist');
-      const exe_names = ['test1', 'test2']
-      const filepaths = exe_names.map((x) => { return path.join(python_dist, x, x) });
-      console.log(`propboi=${this.props.projectPath}`)
+      const exe_names = ['test1', 'test2'];
+      const filepaths = exe_names.map((x) => {
+        return path.join(python_dist, x, x);
+      });
+      console.log(`propboi=${this.props.projectPath}`);
 
-      const crop_process = spawn(filepaths[0],
-        [this.props.photosPath, this.props.projectPath, this.props.dbPath]);
-      crop_process.stdout.on("data", (data) => {
+      const crop_process = spawn(filepaths[0], [
+        this.props.photosPath,
+        this.props.projectPath,
+        this.props.dbPath,
+      ]);
+      crop_process.stdout.on('data', (data) => {
         console.log(`crop stdout: ${data}`);
       });
-      crop_process.stderr.on("data", (data) => {
+      crop_process.stderr.on('data', (data) => {
         console.error(`crop err: ${data}`);
       });
-      crop_process.on("close", (code) => {
+      crop_process.on('close', (code) => {
         if (code !== 0) {
-          console.err("Cropping portion failed.")
+          console.err('Cropping portion failed.');
           return;
         }
         const ocr_process = spawn(filepaths[1], [this.props.dbPath]);
-        ocr_process.stdout.on("data", (data) => {
+        ocr_process.stdout.on('data', (data) => {
           console.log(`ocr stdout: ${data}`);
         });
-        ocr_process.stderr.on("data", (data) => {
+        ocr_process.stderr.on('data', (data) => {
           console.error(`ocr err: ${data}`);
         });
-        ocr_process.on("close", (code) => {
+        ocr_process.on('close', (code) => {
           if (code !== 0) {
-            console.error("OCR portion failed.")
+            console.error('OCR portion failed.');
             return;
-          } else {
-            console.log("Success!!!!!");
           }
+
+          console.log('Success!!!!!');
         });
       });
     }
@@ -84,24 +103,24 @@ class Progress extends Component {
   }
 
   render() {
+    const { classes } = this.props;
+
     return (
       <Template title='Progress'>
-        <Container>
-          <Card>
-            <CardContent>
-              <Typography variant='h5'>Please wait...</Typography>
-              <span />
-              <LinearProgress />
+        <Card className={classes.card}>
+          <CardContent>
+            <Typography variant='h5'>Please wait...</Typography>
 
-              <Button variant='outlined' onClick={this.handleProgress}>
-                home
-              </Button>
-            </CardContent>
-          </Card>
-        </Container>
+            <Button variant='outlined' onClick={this.handleProgress}>
+              DEBUG_NEXT
+            </Button>
+
+            <LinearProgress className={classes.progress} />
+          </CardContent>
+        </Card>
       </Template>
     );
   }
 }
 
-export default Progress;
+export default withStyles(styles, { withTheme: true })(Progress);

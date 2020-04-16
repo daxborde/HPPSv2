@@ -16,7 +16,7 @@ const mapDispatchToProps = (dispatch) => {
       dispatch(push('/new-project'));
       // user.startSql();
       // user.importCSV();
-    }
+    },
   };
 };
 

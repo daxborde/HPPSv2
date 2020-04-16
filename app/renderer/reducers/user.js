@@ -5,7 +5,6 @@ import { remote } from 'electron';
 import { spawn } from 'child_process';
 // import ReduxThunk from 'redux-thunk';
 
-
 const userActions = {
   login: createAction('USER_LOGIN'),
   logout: createAction('USER_LOGOUT'),
@@ -33,13 +32,16 @@ const userActions = {
 
 const reducer = handleActions(
   {
-    [userActions.resetYaboi]: () => { return {}; },
+    [userActions.resetYaboi]: () => {
+      return {};
+    },
     [userActions.login]: (state, action) => {
       return { ...state, ...action.payload };
     },
     [userActions.logout]: (state, action) => {
       return { ...state, ...action.payload };
     },
+
     [userActions.selectProject]: (state, action) => {
       return { ...state, ...action.payload };
     },
@@ -60,7 +62,13 @@ const reducer = handleActions(
       };
     },
     [userActions.importCSV]: (state) => {
-      const programpath = path.join(remote.app.getAppPath(), 'python', 'dist', 'csv_to_sqlite', 'csv_to_sqlite');
+      const programpath = path.join(
+        remote.app.getAppPath(),
+        'python',
+        'dist',
+        'csv_to_sqlite',
+        'csv_to_sqlite',
+      );
       console.log('ap = ' + programpath);
       const csvPath = state.csvPath;
       const dbPath = state.database.filename;
@@ -79,7 +87,7 @@ const reducer = handleActions(
       return {
         ...state,
         ...action.payload,
-      }
+      };
     },
 
     [userActions.startSql]: (state) => {
@@ -90,7 +98,7 @@ const reducer = handleActions(
       console.info('starting db...');
 
       const db = new sqlite3.Database(
-        path.join(state.projectPath, state.projectName+".sqlite3"),
+        path.join(state.projectPath, state.projectName + '.sqlite3'),
         (err) => {
           if (err) return console.error(err.message);
           console.info('Connected to the SQlite database');

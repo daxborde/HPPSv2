@@ -7,7 +7,9 @@ import { userActions } from '../reducers/user';
 const mapStateToProps = (state) => {
   return {
     // ...state
-    dbPath: state.user.database.filename
+    dbPath: state.user.database.filename,
+    photosPath: state.user.photosPath,
+    projectPath: state.user.projectPath,
   };
 };
 

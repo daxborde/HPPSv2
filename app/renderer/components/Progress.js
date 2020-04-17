@@ -44,15 +44,36 @@ class Progress extends Component {
   };
 
   componentDidMount() {
+    // const db = new sqlite3.Database(this.props.dbPath, () => {
+    //   db.all('PRAGMA table_info(CSVData);', (err, rows) => {
+    //     const colnames = rows.map((x) => x.name);
+    //     console.log('yaboi:' + colnames);
+    //     this.props.grabCols({
+    //       csvCols: colnames,
+    //     });
+    //   });
+
+    // open db and store naming pattern
     const db = new sqlite3.Database(this.props.dbPath, () => {
-      db.all('PRAGMA table_info(CSVData);', (err, rows) => {
-        const colnames = rows.map((x) => x.name);
-        console.log('yaboi:' + colnames);
-        this.props.grabCols({
-          csvCols: colnames,
-        });
+      // create new table with value
+      const sql = `CREATE TABLE NamingPattern(
+        pattern TXT ${this.props.namePattern}
+      )`;
+
+      db.run(sql, (err) => {
+        if (err) {
+          // if table exists, update existing value
+          const alt = `UPDATE NamingPattern SET pattern = "${this.props.namePattern}" WHERE _rowid_ = 1`;
+
+          db.run(alt, (err) => {
+            if (err) console.log(err);
+          });
+        }
       });
     });
+
+    // close db when done
+    db.close();
 
     const run_exes = false;
     if (run_exes) {

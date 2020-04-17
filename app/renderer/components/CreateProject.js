@@ -32,6 +32,7 @@ class CreateProject extends Component {
     projectPath: '',
     csvPath: '',
     photosPath: '',
+    namePattern: '',
     padSize: 15,
   };
 
@@ -99,7 +100,7 @@ class CreateProject extends Component {
   };
 
   validate = () => {
-    const requiredFields = ['projectName', 'projectPath', 'csvPath', 'photosPath'];
+    const requiredFields = ['projectName', 'projectPath', 'csvPath', 'photosPath', 'namePattern'];
 
     const newState = {};
     newState['error'] = {};
@@ -124,6 +125,7 @@ class CreateProject extends Component {
       projectPath: this.state.projectPath,
       csvPath: this.state.csvPath,
       photosPath: this.state.photosPath,
+      namePattern: this.state.namePattern,
       padSize: this.state.padSize,
     });
   };
@@ -217,7 +219,19 @@ class CreateProject extends Component {
                 </Grid>
               </Grid>
 
-              {/* TODO - File Rename Pattern */}
+              {/* File Rename Pattern */}
+              <Grid container item justify='center' spacing={2}>
+                <Grid item xs={8}>
+                  <CustomTextField
+                    label='Naming Pattern'
+                    name='namePattern'
+                    type='text'
+                    value={this.state.namePattern}
+                    error={this.state.error['namePattern']}
+                    onChange={this.handleChange}
+                  />
+                </Grid>
+              </Grid>
 
               {/* Pixel Padding Amount */}
               <Grid container item justify='center' spacing={2}>

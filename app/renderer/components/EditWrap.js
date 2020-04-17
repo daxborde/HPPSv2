@@ -76,6 +76,7 @@ class EditWrap extends Component {
     this.getData(index);
   };
 
+  // store changes to values in local state
   handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -84,6 +85,7 @@ class EditWrap extends Component {
     });
   };
 
+  // handle arrow keys
   handleKeyDown = (e) => {
     const { keyCode } = e;
     const disable_prev = this.state.index <= this.state.min;

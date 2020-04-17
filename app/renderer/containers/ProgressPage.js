@@ -10,6 +10,7 @@ const mapStateToProps = (state) => {
     dbPath: state.user.database.filename,
     photosPath: state.user.photosPath,
     projectPath: state.user.projectPath,
+    namePattern: state.user.namePattern,
   };
 };
 

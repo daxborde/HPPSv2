@@ -3,9 +3,8 @@ import sqlite3 from 'sqlite3';
 import Edit from './Edit';
 
 class EditWrap extends Component {
-  // TODO change this back!!!
   state = {
-    dbPath: '/home/alex/Desktop/test/demo1.sqlite3' || this.props.dbPath,
+    dbPath: this.props.dbPath,
     colNames: null,
     data: null,
     index: 0,
@@ -85,7 +84,25 @@ class EditWrap extends Component {
     });
   };
 
+  handleKeyDown = (e) => {
+    const { keyCode } = e;
+    const disable_prev = this.state.index <= this.state.min;
+    const disable_next = this.state.index >= this.state.max;
+
+    switch (keyCode) {
+      case 37:
+        if (disable_prev) return;
+        this.onPrevious();
+        break;
+      case 39:
+        if (disable_next) return;
+        this.onNext();
+        break;
+    }
+  };
+
   componentDidMount() {
+    document.addEventListener('keydown', this.handleKeyDown);
     // open db
     const db = new sqlite3.Database(this.state.dbPath, sqlite3.OPEN_READONLY);
 
@@ -139,6 +156,10 @@ class EditWrap extends Component {
     });
 
     db.close();
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('keydown', this.handleKeyDown);
   }
 
   render() {

@@ -82,7 +82,8 @@ class EditWrap extends Component {
     // string builder
     const params = [];
     const stateWithName = Object.assign(this.state, { "crop_path": finalpath });
-    [...cols, "crop_path"].map((x) => {
+    const colsWithName = [...cols, "crop_path"];
+    colsWithName.map((x) => {
       const tmp = stateWithName[x] ? `"${stateWithName[x]}"` : null;
       params.push(`${x} = ${tmp}`);
     });
@@ -218,10 +219,6 @@ class EditWrap extends Component {
         this.setState(newState);
       });
     });
-
-    // #TODO
-    // const newfilename = this.formatFileName(this.props.renameFormat, tmp.values());
-    // newState['newfilename'] = newfilename;
 
     db.close();
   }

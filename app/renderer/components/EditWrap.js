@@ -33,7 +33,7 @@ class EditWrap extends Component {
     // write back data
     let sql = `UPDATE MatchedResults SET ${args} WHERE _rowid_ = ${this.state.index + 1}`;
 
-    db.all(sql, (err) => {
+    db.run(sql, (err) => {
       if (err) console.log(err);
     });
 

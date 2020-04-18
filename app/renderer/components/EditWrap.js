@@ -13,6 +13,37 @@ class EditWrap extends Component {
     imgPath: '',
   };
 
+  // const inputstring = "{2}-{0}-{4}"
+  // const colvals = ["JOHN", "H", "SMITH", "Pvt 1st class", "304"]
+  formatFileName = (inputstring, colvals) => {
+    const colnums = [], startidxs = [], endidxs = [];
+    let i = 0;
+    for(i = 0; i < inputstring.length; i++) {
+        if(inputstring.charAt(i) === '{') {
+            startidxs.push(i);
+            let j = i;
+            for(j = i; j < inputstring.length; j++) {
+                if(inputstring.charAt(j) === "}") {
+                    break;
+                }
+            }
+            endidxs.push(j);
+            colnums.push(inputstring.slice(i+1, j));
+            i = j;
+        }
+    }
+
+    let finalname = inputstring.slice(endidxs[endidxs.length-1]+1);
+    for(i = colnums.length-1; i >= 0; i--) {
+        const splicestart = i-1 < 0 ? 0 : endidxs[i-1]+1;
+        const spliceend = startidxs[i];
+        finalname = inputstring.slice(splicestart, spliceend) + colvals[colnums[i]] + finalname;
+        console.log(`finalname=${finalname}`);
+    }
+    return finalname;
+  }
+
+
   getData = (index) => {
     // open db
     const db = new sqlite3.Database(this.state.dbPath, sqlite3.OPEN_READWRITE);
@@ -48,6 +79,7 @@ class EditWrap extends Component {
       }
 
       const tmp = data[0];
+      const newfilename = this.formatFileName(this.props.renameFormat, tmp.values());
       const imgPath = tmp['crop_path'];
       delete tmp['crop_path'];
 
@@ -59,6 +91,7 @@ class EditWrap extends Component {
 
       newState['imgPath'] = imgPath;
       newState['index'] = index;
+      newState['newfilename'] = newfilename;
 
       this.setState(newState);
     });

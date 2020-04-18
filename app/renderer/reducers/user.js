@@ -27,12 +27,15 @@ const userActions = {
   grabCols: createAction('GET_COLUMNS'),
 
   // debug
-  resetYaboi: createAction('RESET_YABOI'),
+  resetUserState: createAction('RESET_USER'),
+
+  // change file format string
+  changeFormat: createAction('CHANGE_FORMAT'),
 };
 
 const reducer = handleActions(
   {
-    [userActions.resetYaboi]: () => {
+    [userActions.resetUserState]: () => {
       return {};
     },
     [userActions.login]: (state, action) => {
@@ -120,6 +123,13 @@ const reducer = handleActions(
         };
       }
       return state;
+    },
+
+    [userActions.changeFormat]: (state, action) => {
+      return {
+        ...state,
+        namePattern: action.payload,
+      };
     },
   },
 

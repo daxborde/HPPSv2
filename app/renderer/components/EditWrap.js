@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import sqlite3 from 'sqlite3';
 import Edit from './Edit';
+import fs from 'fs';
+import path from 'path';
 
 class EditWrap extends Component {
   state = {
@@ -43,6 +45,14 @@ class EditWrap extends Component {
     return finalname;
   }
 
+  getColvals = () => {
+    const colvals = [];
+    this.state.colNames.map((x) => {
+      const tmp = this.state[x] ? `${this.state[x]}` : "";
+      colvals.push(tmp);
+    });
+    return colvals;
+  }
 
   getData = (index) => {
     // open db
@@ -51,15 +61,36 @@ class EditWrap extends Component {
     // get column names & discard img path
     const cols = this.state.colNames;
 
+    console.log(`cols=${this.getColvals()[0]}`);
+    console.log(`namepattern=${this.props.namePattern}`);
+    const newfilename = this.formatFileName(this.props.namePattern, this.getColvals());
+    console.log(newfilename);
+    const directory = path.join(this.state.imgPath, "..");
+    const extension = this.state.imgPath.split('.').pop();
+    const finalpath = path.join(directory, newfilename+"."+extension);
+
+    console.log(`directory=${directory}`);
+    console.log(`extension=${extension}`);
+    console.log(`finalpath=${finalpath}`);
+
+    fs.rename(this.state.imgPath, finalpath, (err) => {
+      if(err) {
+        console.error("fs error:"+err)
+      }
+    });
+
     // string builder
     const params = [];
-    cols.map((x) => {
-      const tmp = this.state[x] ? `"${this.state[x]}"` : null;
+    const stateWithName = Object.assign(this.state, { "crop_path": finalpath });
+    [...cols, "crop_path"].map((x) => {
+      const tmp = stateWithName[x] ? `"${stateWithName[x]}"` : null;
       params.push(`${x} = ${tmp}`);
     });
 
     // create list of params to update
     const args = params.join(', ');
+
+    console.log(args);
 
     // write back data
     let sql = `UPDATE MatchedResults SET ${args} WHERE _rowid_ = ${this.state.index + 1}`;
@@ -79,7 +110,6 @@ class EditWrap extends Component {
       }
 
       const tmp = data[0];
-      const newfilename = this.formatFileName(this.props.renameFormat, tmp.values());
       const imgPath = tmp['crop_path'];
       delete tmp['crop_path'];
 
@@ -91,7 +121,6 @@ class EditWrap extends Component {
 
       newState['imgPath'] = imgPath;
       newState['index'] = index;
-      newState['newfilename'] = newfilename;
 
       this.setState(newState);
     });
@@ -189,6 +218,10 @@ class EditWrap extends Component {
         this.setState(newState);
       });
     });
+
+    // #TODO
+    // const newfilename = this.formatFileName(this.props.renameFormat, tmp.values());
+    // newState['newfilename'] = newfilename;
 
     db.close();
   }

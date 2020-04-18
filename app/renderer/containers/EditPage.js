@@ -9,6 +9,7 @@ const mapStateToProps = (state) => {
     ...state,
     csvCols: state.user.csvCols,
     dbPath: state.user.database.filename,
+    namePattern: state.user.namePattern,
   };
 };
 
@@ -18,6 +19,9 @@ const mapDispatchToProps = (dispatch) => {
     onEdit: (data) => {
       user.edit(data);
       dispatch(push('/'));
+    },
+    changeFormat: (data) => {
+      user.changeFormat(data);
     },
   };
 };

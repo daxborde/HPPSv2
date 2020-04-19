@@ -282,3 +282,4 @@ extra-resources/csv_to_sqlite/*
 python/__pycache__
 python/csv_to_sqlite.spec
 .vscode/
+venv/

@@ -11,6 +11,7 @@ const mapStateToProps = (state) => {
     photosPath: state.user.photosPath,
     projectPath: state.user.projectPath,
     namePattern: state.user.namePattern,
+    padSize: state.user.padSize,
   };
 };
 

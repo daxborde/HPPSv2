@@ -105,9 +105,9 @@ const reducer = handleActions(
       }
       console.info('starting db...');
 
-      const path = path.join(state.projectPath, 'data.sqlite3');
+      const dbPath = path.join(state.projectPath, 'data.sqlite3');
 
-      const db = new sqlite3.Database(path, (err) => {
+      const db = new sqlite3.Database(dbPath, (err) => {
         if (err) return console.error(err.message);
         console.info('Connected to the SQlite database');
       });

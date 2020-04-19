@@ -47,9 +47,9 @@ class Home extends Component {
     promise.then((value) => {
       if (value.canceled) return;
 
-      const path = value.filePaths[0];
-      const dbPath = `${path}/data.sqlite3`;
-      // console.log(`path - ${typeof path}: ${path}`);
+      const projectPath = value.filePaths[0];
+      const dbPath = `${projectPath}/data.sqlite3`;
+      // console.log(`projectPath - ${typeof projectPath}: ${projectPath}`);
 
       // check there a db file in folder
       if (!fs.existsSync(dbPath)) {
@@ -82,7 +82,7 @@ class Home extends Component {
 
           this.props.onOpenProject({
             namePattern: pattern,
-            projectPath: path,
+            projectPath: projectPath,
           });
         } catch (e) {
           return console.log(e);

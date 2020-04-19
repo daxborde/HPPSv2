@@ -7,6 +7,8 @@ import FiberNewIcon from '@material-ui/icons/FiberNew';
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
 import fs from 'fs';
 import sqlite3 from 'sqlite3';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
 
 const { dialog } = require('electron').remote;
 
@@ -33,10 +35,18 @@ class Home extends Component {
   };
 
   state = {
-    namePattern: null,
+    error: false,
   };
 
-  getPattern = () => {};
+  handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    this.setState({
+      error: false,
+    });
+  };
 
   handleProjectPath = () => {
     const promise = dialog.showOpenDialog({
@@ -54,6 +64,10 @@ class Home extends Component {
       // check there a db file in folder
       if (!fs.existsSync(dbPath)) {
         // set flag to state to display alert
+        this.setState({
+          error: true,
+        });
+
         return;
       }
 
@@ -99,8 +113,24 @@ class Home extends Component {
 
   render() {
     const { classes } = this.props;
+
     return (
       <Template title='Start Menu'>
+        {/* error notification */}
+        <Snackbar
+          open={this.state.error}
+          autoHideDuration={6000}
+          key='top, right'
+          onClose={this.handleClose}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right',
+          }}>
+          <MuiAlert elevation={6} variant='filled' onClose={this.handleClose} severity='error'>
+            This is not a project folder!
+          </MuiAlert>
+        </Snackbar>
+
         {/* Buttons */}
         <Container className={classes.content} maxWidth='md'>
           <Grid container direction='column' alignItems='center' justify='center' spacing={4}>

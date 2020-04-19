@@ -55,6 +55,7 @@ class Edit extends Component {
           label={x}
           name={x}
           type='text'
+          // autoFocus={index === 0}
           defaultValue={this.props[x]}
           className={classes.item}
           onBlur={this.props.handleChange}

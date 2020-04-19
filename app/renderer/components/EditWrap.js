@@ -18,41 +18,43 @@ class EditWrap extends Component {
   // const inputstring = "{2}-{0}-{4}"
   // const colvals = ["JOHN", "H", "SMITH", "Pvt 1st class", "304"]
   formatFileName = (inputstring, colvals) => {
-    const colnums = [], startidxs = [], endidxs = [];
+    const colnums = [],
+      startidxs = [],
+      endidxs = [];
     let i = 0;
-    for(i = 0; i < inputstring.length; i++) {
-        if(inputstring.charAt(i) === '{') {
-            startidxs.push(i);
-            let j = i;
-            for(j = i; j < inputstring.length; j++) {
-                if(inputstring.charAt(j) === "}") {
-                    break;
-                }
-            }
-            endidxs.push(j);
-            colnums.push(inputstring.slice(i+1, j));
-            i = j;
+    for (i = 0; i < inputstring.length; i++) {
+      if (inputstring.charAt(i) === '{') {
+        startidxs.push(i);
+        let j = i;
+        for (j = i; j < inputstring.length; j++) {
+          if (inputstring.charAt(j) === '}') {
+            break;
+          }
         }
+        endidxs.push(j);
+        colnums.push(inputstring.slice(i + 1, j));
+        i = j;
+      }
     }
 
-    let finalname = inputstring.slice(endidxs[endidxs.length-1]+1);
-    for(i = colnums.length-1; i >= 0; i--) {
-        const splicestart = i-1 < 0 ? 0 : endidxs[i-1]+1;
-        const spliceend = startidxs[i];
-        finalname = inputstring.slice(splicestart, spliceend) + colvals[colnums[i]] + finalname;
-        console.log(`finalname=${finalname}`);
+    let finalname = inputstring.slice(endidxs[endidxs.length - 1] + 1);
+    for (i = colnums.length - 1; i >= 0; i--) {
+      const splicestart = i - 1 < 0 ? 0 : endidxs[i - 1] + 1;
+      const spliceend = startidxs[i];
+      finalname = inputstring.slice(splicestart, spliceend) + colvals[colnums[i]] + finalname;
+      // console.log(`finalname=${finalname}`);
     }
     return finalname;
-  }
+  };
 
   getColvals = () => {
     const colvals = [];
     this.state.colNames.map((x) => {
-      const tmp = this.state[x] ? `${this.state[x]}` : "";
+      const tmp = this.state[x] ? `${this.state[x]}` : '';
       colvals.push(tmp);
     });
     return colvals;
-  }
+  };
 
   getData = (index) => {
     // open db
@@ -61,28 +63,28 @@ class EditWrap extends Component {
     // get column names & discard img path
     const cols = this.state.colNames;
 
-    console.log(`cols=${this.getColvals()[0]}`);
-    console.log(`namepattern=${this.props.namePattern}`);
+    // console.log(`cols=${this.getColvals()[0]}`);
+    // console.log(`namepattern=${this.props.namePattern}`);
     const newfilename = this.formatFileName(this.props.namePattern, this.getColvals());
-    console.log(newfilename);
-    const directory = path.join(this.state.imgPath, "..");
+    // console.log(newfilename);
+    const directory = path.join(this.state.imgPath, '..');
     const extension = this.state.imgPath.split('.').pop();
-    const finalpath = path.join(directory, newfilename+"."+extension);
+    const finalpath = path.join(directory, newfilename + '.' + extension);
 
-    console.log(`directory=${directory}`);
-    console.log(`extension=${extension}`);
-    console.log(`finalpath=${finalpath}`);
+    // console.log(`directory=${directory}`);
+    // console.log(`extension=${extension}`);
+    // console.log(`finalpath=${finalpath}`);
 
     fs.rename(this.state.imgPath, finalpath, (err) => {
-      if(err) {
-        console.error("fs error:"+err)
+      if (err) {
+        console.error('fs error:' + err);
       }
     });
 
     // string builder
     const params = [];
-    const stateWithName = Object.assign(this.state, { "crop_path": finalpath });
-    const colsWithName = [...cols, "crop_path"];
+    const stateWithName = Object.assign(this.state, { crop_path: finalpath });
+    const colsWithName = [...cols, 'crop_path'];
     colsWithName.map((x) => {
       const tmp = stateWithName[x] ? `"${stateWithName[x]}"` : null;
       params.push(`${x} = ${tmp}`);
@@ -91,7 +93,7 @@ class EditWrap extends Component {
     // create list of params to update
     const args = params.join(', ');
 
-    console.log(args);
+    // console.log(args);
 
     // write back data
     let sql = `UPDATE MatchedResults SET ${args} WHERE _rowid_ = ${this.state.index + 1}`;

@@ -152,9 +152,20 @@ class EditWrap extends Component {
 
   // handle arrow keys
   handleKeyDown = (e) => {
-    const { keyCode } = e;
+    const tagName = e.target.tagName.toLowerCase();
+    const keyCode = e.keyCode;
+
     const disable_prev = this.state.index <= this.state.min;
     const disable_next = this.state.index >= this.state.max;
+
+    // console.log(target);
+
+    switch (tagName) {
+      case 'input':
+      case 'textarea':
+      case 'select':
+        return;
+    }
 
     switch (keyCode) {
       case 37:

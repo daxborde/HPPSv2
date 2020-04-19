@@ -28,7 +28,6 @@ class CreateProject extends Component {
 
   state = {
     error: {},
-    projectName: '',
     projectPath: '',
     csvPath: '',
     photosPath: '',
@@ -100,7 +99,7 @@ class CreateProject extends Component {
   };
 
   validate = () => {
-    const requiredFields = ['projectName', 'projectPath', 'csvPath', 'photosPath', 'namePattern'];
+    const requiredFields = ['projectPath', 'csvPath', 'photosPath', 'namePattern'];
 
     const newState = {};
     newState['error'] = {};
@@ -121,7 +120,6 @@ class CreateProject extends Component {
     if (this.validate()) return;
 
     this.props.onCreateProject({
-      projectName: this.state.projectName,
       projectPath: this.state.projectPath,
       csvPath: this.state.csvPath,
       photosPath: this.state.photosPath,
@@ -138,21 +136,6 @@ class CreateProject extends Component {
         <Card className={classes.card}>
           <form>
             <Grid container direction='column' justify='center' alignItems='center' spacing={3}>
-              {/* Project Name */}
-              <Grid container item justify='center' spacing={2}>
-                <Grid item xs={8}>
-                  <CustomTextField
-                    label='Project Name'
-                    name='projectName'
-                    type='text'
-                    value={this.state.projectName}
-                    autoFocus={true}
-                    error={this.state.error['projectName']}
-                    onChange={this.handleChange}
-                  />
-                </Grid>
-              </Grid>
-
               {/* Project Location */}
               <Grid container item justify='center' spacing={2}>
                 <Grid item xs={2} />

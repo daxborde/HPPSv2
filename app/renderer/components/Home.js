@@ -5,6 +5,12 @@ import { withStyles } from '@material-ui/core/styles';
 import Template from './Template';
 import FiberNewIcon from '@material-ui/icons/FiberNew';
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
+import fs from 'fs';
+import sqlite3 from 'sqlite3';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
+
+const { dialog } = require('electron').remote;
 
 const styles = (theme) => ({
   content: {
@@ -28,6 +34,77 @@ class Home extends Component {
     onSelectProject: PropTypes.func.isRequired,
   };
 
+  state = {
+    error: false,
+  };
+
+  handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    this.setState({
+      error: false,
+    });
+  };
+
+  handleProjectPath = () => {
+    const promise = dialog.showOpenDialog({
+      title: 'Select Existing Project Folder',
+      properties: ['openDirectory'],
+    });
+
+    promise.then((value) => {
+      if (value.canceled) return;
+
+      const projectPath = value.filePaths[0];
+      const dbPath = `${projectPath}/data.sqlite3`;
+      // console.log(`projectPath - ${typeof projectPath}: ${projectPath}`);
+
+      // check there a db file in folder
+      if (!fs.existsSync(dbPath)) {
+        // set flag to state to display alert
+        this.setState({
+          error: true,
+        });
+
+        return;
+      }
+
+      const db = new sqlite3.Database(dbPath);
+      const sql = 'SELECT pattern from NamingPattern WHERE _rowid_ = 1';
+
+      // create async sqlite3 operation
+      db.query = function(sql) {
+        const that = this;
+        return new Promise((resolve, reject) => {
+          that.all(sql, (err, data) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(data);
+            }
+          });
+        });
+      };
+
+      // get naming pattern from the db
+      (async () => {
+        try {
+          const result = await db.query(sql);
+          const pattern = result[0]['pattern'];
+
+          this.props.onOpenProject({
+            namePattern: pattern,
+            projectPath: projectPath,
+          });
+        } catch (e) {
+          return console.log(e);
+        }
+      })();
+    });
+  };
+
   handleProject = () => {
     this.props.onSelectProject({
       createNew: true,
@@ -36,8 +113,24 @@ class Home extends Component {
 
   render() {
     const { classes } = this.props;
+
     return (
       <Template title='Start Menu'>
+        {/* error notification */}
+        <Snackbar
+          open={this.state.error}
+          autoHideDuration={6000}
+          key='top, right'
+          onClose={this.handleClose}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right',
+          }}>
+          <MuiAlert elevation={6} variant='filled' onClose={this.handleClose} severity='error'>
+            This is not a project folder!
+          </MuiAlert>
+        </Snackbar>
+
         {/* Buttons */}
         <Container className={classes.content} maxWidth='md'>
           <Grid container direction='column' alignItems='center' justify='center' spacing={4}>
@@ -54,9 +147,12 @@ class Home extends Component {
             </Grid>
 
             {/* Open Project */}
-            {/* TODO - Bind action to open & open modal to ask to edit settings */}
             <Grid item>
-              <Fab className={classes.button} variant='extended' color='default'>
+              <Fab
+                className={classes.button}
+                variant='extended'
+                color='default'
+                onClick={this.handleProjectPath}>
                 <FolderOpenIcon className={classes.extendedIcon} />
                 Open Project
               </Fab>

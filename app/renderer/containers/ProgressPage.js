@@ -12,6 +12,7 @@ const mapStateToProps = (state) => {
     projectPath: state.user.projectPath,
     namePattern: state.user.namePattern,
     padSize: state.user.padSize,
+    csvPath: state.user.csvPath,
   };
 };
 

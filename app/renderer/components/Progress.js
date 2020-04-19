@@ -56,9 +56,8 @@ class Progress extends Component {
     // open db and store naming pattern
     const db = new sqlite3.Database(this.props.dbPath, () => {
       // create new table with value
-      const sql = `CREATE TABLE NamingPattern(
-        pattern TXT ${this.props.namePattern}
-      )`;
+      const sql = `CREATE TABLE NamingPattern(pattern TXT);
+      INSERT INTO NamingPattern (pattern) VALUES ("${this.props.namePattern}");`;
 
       db.run(sql, (err) => {
         if (err) {
@@ -76,7 +75,7 @@ class Progress extends Component {
     db.close();
 
     const python_dist = path.join(remote.app.getAppPath(), 'python', 'dist');
-    const exe_names = ['crop_images', 'ocr_predict_gpu'];
+    const exe_names = ['crop_images', 'ocr_predict_gpu', 'fuzzy_search'];
     const filepaths = exe_names.map((x) => {
       return path.join(python_dist, x, x);
     });
@@ -96,34 +95,56 @@ class Progress extends Component {
     crop_process.stdout.on('data', (data) => {
       console.log(`crop stdout: ${data}`);
     });
-    // crop_process.stderr.on('data', (data) => {
-    //   console.error(`crop err: ${data}`);
-    // });
+    crop_process.stderr.on('data', (data) => {
+      console.warn(`crop err: ${data}`);
+    });
     crop_process.on('close', (code) => {
       if (code !== 0) {
         console.error('Cropping portion failed.');
         return;
       }
       console.log('Success!!!!!');
-      // const ocr_process = spawn(filepaths[1], [this.props.dbPath]);
-      // ocr_process.stdout.on('data', (data) => {
-      //   console.log(`ocr stdout: ${data}`);
-      // });
-      // ocr_process.stderr.on('data', (data) => {
-      //   console.error(`ocr err: ${data}`);
-      // });
-      // ocr_process.on('close', (code) => {
-      //   if (code !== 0) {
-      //     console.error('OCR portion failed.');
-      //     return;
-      //   }
-
-      //   console.log('Success!!!!!');
-      // });
+      const ocr_process = spawn(filepaths[1], [
+        this.props.projectPath,
+        this.props.dbPath,
+      ],{
+        cwd: path.join(filepaths[1], ".."),
+      });
+      ocr_process.stdout.on('data', (data) => {
+        console.log(`ocr stdout: ${data}`);
+      });
+      ocr_process.stderr.on('data', (data) => {
+        console.warn(`ocr err: ${data}`);
+      });
+      ocr_process.on('close', (code) => {
+        if (code !== 0) {
+          console.error('OCR portion failed.');
+          return;
+        }
+        console.log('Success2!!!!!');
+        const fuzz_process = spawn(filepaths[2], [
+          this.props.csvPath,
+          this.props.dbPath,
+        ],{
+          cwd: path.join(filepaths[2], ".."),
+        });
+        fuzz_process.stdout.on('data', (data) => {
+          console.log(`fuzz stdout: ${data}`);
+        });
+        fuzz_process.stderr.on('data', (data) => {
+          console.warn(`fuzz err: ${data}`);
+        });
+        fuzz_process.on('close', (code) => {
+          if (code !== 0) {
+            console.error('Fuzzy Search portion failed.');
+            return;
+          }
+          console.log('Success3!!!!!');
+        });
+      });
     });
 
     // const mycolnames = await database_actions;
-
     // console.log(mycolnames);
   }
 

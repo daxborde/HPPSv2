@@ -12,6 +12,7 @@ const userActions = {
   // pages
   selectProject: createAction('SELECT_PROJECT'),
   createProject: createAction('CREATE_PROJECT'),
+  openProject: createAction('OPEN_PROJECT'),
   progress: createAction('SHOW_PROGRESS'),
   edit: createAction('EDIT_IMAGE'),
 
@@ -25,6 +26,7 @@ const userActions = {
 
   // thunk
   grabCols: createAction('GET_COLUMNS'),
+  grabNamePattern: createAction('FIND_DATABASE'),
 
   // debug
   resetUserState: createAction('RESET_USER'),
@@ -49,6 +51,9 @@ const reducer = handleActions(
       return { ...state, ...action.payload };
     },
     [userActions.createProject]: (state, action) => {
+      return { ...state, ...action.payload };
+    },
+    [userActions.openProject]: (state, action) => {
       return { ...state, ...action.payload };
     },
     [userActions.progress]: (state, action) => {
@@ -100,13 +105,12 @@ const reducer = handleActions(
       }
       console.info('starting db...');
 
-      const db = new sqlite3.Database(
-        path.join(state.projectPath, state.projectName + '.sqlite3'),
-        (err) => {
-          if (err) return console.error(err.message);
-          console.info('Connected to the SQlite database');
-        },
-      );
+      const path = path.join(state.projectPath, 'data.sqlite3');
+
+      const db = new sqlite3.Database(path, (err) => {
+        if (err) return console.error(err.message);
+        console.info('Connected to the SQlite database');
+      });
 
       return {
         ...state,

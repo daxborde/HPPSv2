@@ -11,11 +11,14 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   const user = bindActionCreators(userActions, dispatch);
   return {
+    onOpenProject: (data) => {
+      user.openProject(data);
+      user.startSql();
+      dispatch(push('/edit'));
+    },
     onSelectProject: (data) => {
       user.selectProject(data);
       dispatch(push('/new-project'));
-      // user.startSql();
-      // user.importCSV();
     },
   };
 };

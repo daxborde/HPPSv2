@@ -5,6 +5,10 @@ import { withStyles } from '@material-ui/core/styles';
 import Template from './Template';
 import FiberNewIcon from '@material-ui/icons/FiberNew';
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
+import fs from 'fs';
+import sqlite3 from 'sqlite3';
+
+const { dialog } = require('electron').remote;
 
 const styles = (theme) => ({
   content: {
@@ -26,6 +30,65 @@ const styles = (theme) => ({
 class Home extends Component {
   static propTypes = {
     onSelectProject: PropTypes.func.isRequired,
+  };
+
+  state = {
+    namePattern: null,
+  };
+
+  getPattern = () => {};
+
+  handleProjectPath = () => {
+    const promise = dialog.showOpenDialog({
+      title: 'Select Existing Project Folder',
+      properties: ['openDirectory'],
+    });
+
+    promise.then((value) => {
+      if (value.canceled) return;
+
+      const path = value.filePaths[0];
+      const dbPath = `${path}/data.sqlite3`;
+      // console.log(`path - ${typeof path}: ${path}`);
+
+      // check there a db file in folder
+      if (!fs.existsSync(dbPath)) {
+        // set flag to state to display alert
+        return;
+      }
+
+      const db = new sqlite3.Database(dbPath);
+      const sql = 'SELECT pattern from NamingPattern WHERE _rowid_ = 1';
+
+      // create async sqlite3 operation
+      db.query = function(sql) {
+        const that = this;
+        return new Promise((resolve, reject) => {
+          that.all(sql, (err, data) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(data);
+            }
+          });
+        });
+      };
+
+      // get naming pattern from the db
+      (async () => {
+        try {
+          const result = await db.query(sql);
+          const pattern = result[0]['pattern'];
+
+          this.props.onOpenProject({
+            namePattern: pattern,
+            projectPath: path,
+          });
+        } catch (e) {
+          return console.log(e);
+        }
+      })();
+    });
   };
 
   handleProject = () => {
@@ -54,9 +117,12 @@ class Home extends Component {
             </Grid>
 
             {/* Open Project */}
-            {/* TODO - Bind action to open & open modal to ask to edit settings */}
             <Grid item>
-              <Fab className={classes.button} variant='extended' color='default'>
+              <Fab
+                className={classes.button}
+                variant='extended'
+                color='default'
+                onClick={this.handleProjectPath}>
                 <FolderOpenIcon className={classes.extendedIcon} />
                 Open Project
               </Fab>

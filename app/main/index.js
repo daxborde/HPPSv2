@@ -42,8 +42,8 @@ app.on('ready', async () => {
   mainWindow = new BrowserWindow({
     width: 1000,
     height: 800,
-    minWidth: 640,
-    minHeight: 480,
+    minWidth: 1000,
+    minHeight: 800,
     show: false,
     webPreferences: {
       nodeIntegration: true,

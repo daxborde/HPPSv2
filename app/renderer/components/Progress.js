@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Card, CardContent, LinearProgress, Typography } from '@material-ui/core';
+import { Card, CardContent, LinearProgress, Typography } from '@material-ui/core';
 import Template from './Template';
 import { withStyles } from '@material-ui/core/styles';
 import sqlite3 from 'sqlite3';
@@ -53,23 +53,33 @@ class Progress extends Component {
     //     });
     //   });
 
-    // open db and store naming pattern
-    const db = new sqlite3.Database(this.props.dbPath, () => {
-      // create new table with value
-      const sql = `CREATE TABLE NamingPattern(pattern TXT);
-      INSERT INTO NamingPattern (pattern) VALUES ("${this.props.namePattern}");`;
+    const db = new sqlite3.Database(this.props.dbPath);
+    const sql = `DROP TABLE IF EXISTS NamingPattern;
+        CREATE TABLE NamingPattern(pattern TXT);
+        INSERT INTO NamingPattern (pattern) VALUES ("${this.props.namePattern}");`;
 
-      db.run(sql, (err) => {
-        if (err) {
-          // if table exists, update existing value
-          const alt = `UPDATE NamingPattern SET pattern = "${this.props.namePattern}" WHERE _rowid_ = 1`;
-
-          db.run(alt, (err) => {
-            if (err) console.log(err);
-          });
-        }
+    // create async sqlite3 operation
+    db.query = function (sql) {
+      const that = this;
+      return new Promise((resolve, reject) => {
+        that.exec(sql, (err) => {
+          if (err !== null) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
       });
-    });
+    };
+
+    // store naming pattern in the db
+    (async () => {
+      try {
+        await db.query(sql);
+      } catch (e) {
+        return console.log(e);
+      }
+    })();
 
     // close db when done
     db.close();
@@ -163,9 +173,9 @@ class Progress extends Component {
           <CardContent>
             <Typography variant='h5'>Please wait...</Typography>
 
-            <Button variant='outlined' onClick={this.handleProgress}>
-              DEBUG_NEXT
-            </Button>
+            {/*<Button variant='outlined' onClick={this.handleProgress}>*/}
+            {/*  DEBUG_NEXT*/}
+            {/*</Button>*/}
 
             <LinearProgress className={classes.progress} />
           </CardContent>

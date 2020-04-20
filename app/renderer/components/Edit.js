@@ -64,7 +64,7 @@ class Edit extends Component {
     };
 
     return (
-      <Template title='Edit'>
+      <Template title='Review'>
         <div className={classes.wrapper}>
           <div key={this.props.imgPath} className={classes.photo}>
             <Card

@@ -3,6 +3,8 @@ import sqlite3 from 'sqlite3';
 import Edit from './Edit';
 import fs from 'fs';
 import path from 'path';
+import { spawn } from 'child_process';
+import { remote } from 'electron';
 
 class EditWrap extends Component {
   state = {
@@ -69,21 +71,45 @@ class EditWrap extends Component {
     // console.log(newfilename);
     const directory = path.join(this.state.imgPath, '..');
     const extension = this.state.imgPath.split('.').pop();
-    const finalpath = path.join(directory, newfilename + '.' + extension);
+    const finalimgpath = path.join(directory, newfilename + '.' + extension);
 
     // console.log(`directory=${directory}`);
     // console.log(`extension=${extension}`);
     // console.log(`finalpath=${finalpath}`);
 
-    fs.rename(this.state.imgPath, finalpath, (err) => {
+    fs.rename(this.state.imgPath, finalimgpath, (err) => {
       if (err) {
         console.error('fs error:' + err);
       }
     });
 
+    const python_dist = path.join(remote.app.getAppPath(), 'python', 'dist');
+    const exe_name = 'exif_data';
+    const filepath = path.join(python_dist, exe_name, exe_name);
+    console.log(`propboi=${this.props.projectPath}`);
+
+    const statestring = JSON.stringify(this.state)
+
+    const exif_process = spawn(filepath, [
+      "-i",
+      finalimgpath,
+      "-m",
+      statestring,
+    ],
+    {
+      cwd: path.join(filepath, ".."),
+      // stdio: ['ignore', process.stdout, process.stderr],
+    });
+    exif_process.stdout.on('data', (data) => {
+      console.log(`crop stdout: ${data}`);
+    });
+    exif_process.stderr.on('data', (data) => {
+      console.warn(`crop err: ${data}`);
+    });
+
     // string builder
     const params = [];
-    const stateWithName = Object.assign(this.state, { crop_path: finalpath });
+    const stateWithName = Object.assign(this.state, { crop_path: finalimgpath });
     const colsWithName = [...cols, 'crop_path'];
     colsWithName.map((x) => {
       const tmp = stateWithName[x] ? `"${stateWithName[x]}"` : null;

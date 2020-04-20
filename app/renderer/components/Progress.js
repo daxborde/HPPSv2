@@ -74,7 +74,12 @@ class Progress extends Component {
     // close db when done
     db.close();
 
-    const python_dist = path.join(remote.app.getAppPath(), 'python', 'dist');
+    let app_path = remote.app.getAppPath();
+    // If true, we are in a packaged environment
+    if(app_path.split(path.sep).pop().includes("asar")) {
+      app_path = path.join(app_path, "..");
+    }
+    const python_dist = path.join(app_path, 'python', 'dist');
     const exe_names = ['crop_images', 'ocr_predict_gpu', 'fuzzy_search'];
     const filepaths = exe_names.map((x) => {
       return path.join(python_dist, x, x);

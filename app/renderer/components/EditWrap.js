@@ -83,7 +83,12 @@ class EditWrap extends Component {
       }
     });
 
-    const python_dist = path.join(remote.app.getAppPath(), 'python', 'dist');
+    let app_path = remote.app.getAppPath();
+    // If true, we are in a packaged environment
+    if(app_path.split(path.sep).pop().includes("asar")) {
+      app_path = path.join(app_path, "..");
+    }
+    const python_dist = path.join(app_path, 'python', 'dist');
     const exe_name = 'exif_data';
     const filepath = path.join(python_dist, exe_name, exe_name);
     console.log(`propboi=${this.props.projectPath}`);

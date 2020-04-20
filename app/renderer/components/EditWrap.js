@@ -58,9 +58,22 @@ class EditWrap extends Component {
     return colvals;
   };
 
-  getData = (index) => {
+  setData = () => {
     // open db
     const db = new sqlite3.Database(this.state.dbPath, sqlite3.OPEN_READWRITE);
+
+    db.query = function (sql) {
+      const that = this;
+      return new Promise((resolve, reject) => {
+        that.run(sql, (err) => {
+          if (err !== null) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      });
+    };
 
     // get column names & discard img path
     const cols = this.state.colNames;
@@ -68,7 +81,6 @@ class EditWrap extends Component {
     // console.log(`cols=${this.getColvals()[0]}`);
     // console.log(`namepattern=${this.props.namePattern}`);
     const newfilename = this.formatFileName(this.props.namePattern, this.getColvals());
-    // console.log(newfilename);
     const directory = path.join(this.state.imgPath, '..');
     const extension = this.state.imgPath.split('.').pop();
     const finalimgpath = path.join(directory, newfilename + '.' + extension);
@@ -85,24 +97,17 @@ class EditWrap extends Component {
 
     let app_path = remote.app.getAppPath();
     // If true, we are in a packaged environment
-    if(app_path.split(path.sep).pop().includes("asar")) {
-      app_path = path.join(app_path, "..");
+    if (app_path.split(path.sep).pop().includes('asar')) {
+      app_path = path.join(app_path, '..');
     }
     const python_dist = path.join(app_path, 'python', 'dist');
     const exe_name = 'exif_data';
     const filepath = path.join(python_dist, exe_name, exe_name);
-    console.log(`propboi=${this.props.projectPath}`);
 
-    const statestring = JSON.stringify(this.state)
+    const statestring = JSON.stringify(this.state);
 
-    const exif_process = spawn(filepath, [
-      "-i",
-      finalimgpath,
-      "-m",
-      statestring,
-    ],
-    {
-      cwd: path.join(filepath, ".."),
+    const exif_process = spawn(filepath, ['-i', finalimgpath, '-m', statestring], {
+      cwd: path.join(filepath, '..'),
       // stdio: ['ignore', process.stdout, process.stderr],
     });
     exif_process.stdout.on('data', (data) => {
@@ -127,48 +132,77 @@ class EditWrap extends Component {
     // console.log(args);
 
     // write back data
-    let sql = `UPDATE MatchedResults SET ${args} WHERE _rowid_ = ${this.state.index + 1}`;
+    const sql = `UPDATE MatchedResults SET ${args} WHERE _rowid_ = ${this.state.index + 1}`;
 
-    db.run(sql, (err) => {
-      if (err) console.log(err);
-    });
+    (async () => {
+      try {
+        await db.query(sql);
+      } catch (e) {
+        return console.log(e);
+      }
+    })();
+
+    db.close();
+  };
+
+  getData = (index) => {
+    // open db
+    const db = new sqlite3.Database(this.state.dbPath, sqlite3.OPEN_READWRITE);
+
+    db.query = function (sql) {
+      const that = this;
+      return new Promise((resolve, reject) => {
+        that.all(sql, (err, data) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(data);
+          }
+        });
+      });
+    };
+
+    // get col names
+    const cols = this.state.colNames;
 
     // generate sql query
-    sql = `SELECT ${cols},crop_path FROM MatchedResults LIMIT 1 OFFSET ${index}`;
+    const sql = `SELECT ${cols},crop_path FROM MatchedResults LIMIT 1 OFFSET ${index}`;
 
-    // query db
-    db.all(sql, (err, data) => {
-      if (err) {
-        console.log('error: ' + err);
-        return;
+    // async query db
+    (async () => {
+      try {
+        const data = await db.query(sql);
+        const tmp = data[0];
+        const imgPath = tmp['crop_path'];
+        delete tmp['crop_path'];
+
+        const newState = {};
+        const keys = Object.keys(tmp);
+        for (const key of keys) {
+          newState[key] = tmp[key];
+        }
+
+        newState['imgPath'] = imgPath;
+        newState['index'] = index;
+
+        this.setState(newState);
+      } catch (e) {
+        return console.log(e);
       }
-
-      const tmp = data[0];
-      const imgPath = tmp['crop_path'];
-      delete tmp['crop_path'];
-
-      const newState = {};
-      const keys = Object.keys(tmp);
-      for (const key of keys) {
-        newState[key] = tmp[key];
-      }
-
-      newState['imgPath'] = imgPath;
-      newState['index'] = index;
-
-      this.setState(newState);
-    });
+    })();
 
     db.close();
   };
 
   onNext = () => {
     const index = parseInt(this.state.index) + 1;
+    this.setData();
     this.getData(index);
   };
 
   onPrevious = () => {
     const index = parseInt(this.state.index) - 1;
+    this.setData();
     this.getData(index);
   };
 
@@ -208,6 +242,11 @@ class EditWrap extends Component {
         this.onNext();
         break;
     }
+  };
+
+  handleOnFinish = () => {
+    this.setData();
+    this.props.onFinish();
   };
 
   componentDidMount() {
@@ -281,6 +320,7 @@ class EditWrap extends Component {
         {...this.state}
         onPrevious={this.onPrevious}
         onNext={this.onNext}
+        onFinish={this.handleOnFinish}
         handleChange={this.handleChange}
         b1={disable_prev}
         b2={disable_next}

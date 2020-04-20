@@ -14,7 +14,8 @@ const userActions = {
   createProject: createAction('CREATE_PROJECT'),
   openProject: createAction('OPEN_PROJECT'),
   progress: createAction('SHOW_PROGRESS'),
-  edit: createAction('EDIT_IMAGE'),
+  finish: createAction('EDIT_IMAGE'),
+  home: createAction('HOME'),
 
   // middleware
   startPy: createAction('START_PYTHON'),
@@ -59,7 +60,10 @@ const reducer = handleActions(
     [userActions.progress]: (state, action) => {
       return { ...state, ...action.payload };
     },
-    [userActions.edit]: (state, action) => {
+    [userActions.finish]: (state, action) => {
+      return { ...state, ...action.payload };
+    },
+    [userActions.home]: (state, action) => {
       return { ...state, ...action.payload };
     },
 

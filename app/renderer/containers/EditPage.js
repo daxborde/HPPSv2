@@ -16,9 +16,9 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   const user = bindActionCreators(userActions, dispatch);
   return {
-    onEdit: (data) => {
+    onFinish: (data) => {
       user.edit(data);
-      dispatch(push('/'));
+      dispatch(push('/finish'));
     },
     changeFormat: (data) => {
       user.changeFormat(data);

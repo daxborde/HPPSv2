@@ -35,7 +35,7 @@ const styles = (theme) => ({
   buttons: {
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
   },
   item: {
     marginBottom: theme.spacing(3),
@@ -78,12 +78,19 @@ class Edit extends Component {
             <div key={this.props.index}>{list(this.props.colNames)}</div>
 
             <div className={classes.buttons}>
-              <CustomButton disabled={this.props.b1} onClick={this.props.onPrevious}>
-                <NavigateBeforeIcon />
-              </CustomButton>
-              <CustomButton disabled={this.props.b2} onClick={this.props.onNext}>
-                <NavigateNextIcon />
-              </CustomButton>
+              <div>
+                <CustomButton onClick={this.props.onFinish}>
+                  Finish
+                </CustomButton>
+              </div>
+              <div>
+                <CustomButton disabled={this.props.b1} onClick={this.props.onPrevious}>
+                  <NavigateBeforeIcon />
+                </CustomButton>
+                <CustomButton disabled={this.props.b2} onClick={this.props.onNext}>
+                  <NavigateNextIcon />
+                </CustomButton>
+              </div>
             </div>
           </Card>
         </div>

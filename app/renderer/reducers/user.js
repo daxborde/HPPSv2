@@ -70,8 +70,13 @@ const reducer = handleActions(
       };
     },
     [userActions.importCSV]: (state) => {
+      let app_path = remote.app.getAppPath();
+      // If true, we are in a packaged environment
+      if(app_path.split(path.sep).pop().includes("asar")) {
+        app_path = path.join(app_path, "..");
+      }
       const programpath = path.join(
-        remote.app.getAppPath(),
+        app_path,
         'python',
         'dist',
         'csv_to_sqlite',

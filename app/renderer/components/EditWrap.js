@@ -320,7 +320,8 @@ class EditWrap extends Component {
         {...this.state}
         onPrevious={this.onPrevious}
         onNext={this.onNext}
-        onFinish={this.handleOnFinish}
+        handleFinish={this.handleOnFinish}
+        onFinish={this.props.onFinish}
         handleChange={this.handleChange}
         b1={disable_prev}
         b2={disable_next}

@@ -81,17 +81,20 @@ class Progress extends Component {
     });
     console.log(`propboi=${this.props.projectPath}`);
 
-    const crop_process = spawn(filepaths[0], [
-      this.props.photosPath,
-      this.props.projectPath,
-      this.props.dbPath,
-      "--padding",
-      this.props.padSize,
-    ],
-    {
-      cwd: path.join(filepaths[0], ".."),
-      // stdio: ['ignore', process.stdout, process.stderr],
-    });
+    const crop_process = spawn(
+      filepaths[0],
+      [
+        this.props.photosPath,
+        this.props.projectPath,
+        this.props.dbPath,
+        '--padding',
+        this.props.padSize,
+      ],
+      {
+        cwd: path.join(filepaths[0], '..'),
+        // stdio: ['ignore', process.stdout, process.stderr],
+      },
+    );
     crop_process.stdout.on('data', (data) => {
       console.log(`crop stdout: ${data}`);
     });
@@ -104,11 +107,8 @@ class Progress extends Component {
         return;
       }
       console.log('Success!!!!!');
-      const ocr_process = spawn(filepaths[1], [
-        this.props.projectPath,
-        this.props.dbPath,
-      ],{
-        cwd: path.join(filepaths[1], ".."),
+      const ocr_process = spawn(filepaths[1], [this.props.projectPath, this.props.dbPath], {
+        cwd: path.join(filepaths[1], '..'),
       });
       ocr_process.stdout.on('data', (data) => {
         console.log(`ocr stdout: ${data}`);
@@ -122,11 +122,8 @@ class Progress extends Component {
           return;
         }
         console.log('Success2!!!!!');
-        const fuzz_process = spawn(filepaths[2], [
-          this.props.csvPath,
-          this.props.dbPath,
-        ],{
-          cwd: path.join(filepaths[2], ".."),
+        const fuzz_process = spawn(filepaths[2], [this.props.csvPath, this.props.dbPath], {
+          cwd: path.join(filepaths[2], '..'),
         });
         fuzz_process.stdout.on('data', (data) => {
           console.log(`fuzz stdout: ${data}`);

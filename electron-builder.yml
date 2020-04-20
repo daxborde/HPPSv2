@@ -1,6 +1,10 @@
-appId: com.example.app
-copyright: Example co
-productName: MyApp
+appId: edu.ucf.hpps
+
+github:
+  com/daxborde/HPPSv2:
+
+copyright: MIT
+productName: Headstone Photo Processing System
 
 asar: true
 

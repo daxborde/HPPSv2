@@ -140,6 +140,7 @@ class Progress extends Component {
             return;
           }
           console.log('Success3!!!!!');
+          this.handleProgress();
         });
       });
     });

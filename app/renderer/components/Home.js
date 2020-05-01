@@ -10,8 +10,6 @@ import sqlite3 from 'sqlite3';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 
-const { dialog } = require('electron').remote;
-
 const styles = (theme) => ({
   content: {
     position: 'absolute',
@@ -48,62 +46,65 @@ class Home extends Component {
     });
   };
 
-  handleProjectPath = () => {
-    const promise = dialog.showOpenDialog({
-      title: 'Select Existing Project Folder',
-      properties: ['openDirectory'],
-    });
+  handleProjectPath = async () => {
+    let result;
+    try {
+      const { dialog } = require('electron').remote;
 
-    promise.then((value) => {
-      if (value.canceled) return;
+      result = await dialog.showOpenDialog({
+        title: 'Select Existing Project Folder',
+        properties: ['openDirectory'],
+      });
+    } catch (e) {
+      console.error(e);
+    }
 
-      const projectPath = value.filePaths[0];
-      const dbPath = `${projectPath}/data.sqlite3`;
-      // console.log(`projectPath - ${typeof projectPath}: ${projectPath}`);
+    if (result.canceled) return;
 
-      // check there a db file in folder
-      if (!fs.existsSync(dbPath)) {
-        // set flag to state to display alert
-        this.setState({
-          error: true,
+    const projectPath = result.filePaths[0];
+    const dbPath = `${projectPath}/data.sqlite3`;
+    // console.log(`projectPath - ${typeof projectPath}: ${projectPath}`);
+
+    // check there a db file in folder
+    if (!fs.existsSync(dbPath)) {
+      // set flag to state to display alert
+      this.setState({
+        error: true,
+      });
+
+      return;
+    }
+
+    const db = new sqlite3.Database(dbPath);
+
+    // create async sqlite3 operation
+    db.query = function (sql) {
+      const that = this;
+      return new Promise((resolve, reject) => {
+        that.all(sql, (err, data) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(data);
+          }
         });
+      });
+    };
 
-        return;
-      }
-
-      const db = new sqlite3.Database(dbPath);
+    // get naming pattern from the db
+    try {
       const sql = 'SELECT pattern from NamingPattern WHERE _rowid_ = 1';
+      const result = await db.query(sql);
+      const pattern = result[0]['pattern'];
 
-      // create async sqlite3 operation
-      db.query = function (sql) {
-        const that = this;
-        return new Promise((resolve, reject) => {
-          that.all(sql, (err, data) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(data);
-            }
-          });
-        });
-      };
-
-      // get naming pattern from the db
-      (async () => {
-        try {
-          const result = await db.query(sql);
-          const pattern = result[0]['pattern'];
-
-          db.close();
-          this.props.onOpenProject({
-            namePattern: pattern,
-            projectPath: projectPath,
-          });
-        } catch (e) {
-          return console.log(e);
-        }
-      })();
-    });
+      db.close();
+      this.props.onOpenProject({
+        namePattern: pattern,
+        projectPath: projectPath,
+      });
+    } catch (e) {
+      return console.log(e);
+    }
   };
 
   handleProject = () => {

@@ -44,19 +44,8 @@ class Progress extends Component {
   };
 
   componentDidMount() {
-    // const db = new sqlite3.Database(this.props.dbPath, () => {
-    //   db.all('PRAGMA table_info(CSVData);', (err, rows) => {
-    //     const colnames = rows.map((x) => x.name);
-    //     console.log('yaboi:' + colnames);
-    //     this.props.grabCols({
-    //       csvCols: colnames,
-    //     });
-    //   });
-
+    // open db
     const db = new sqlite3.Database(this.props.dbPath);
-    const sql = `DROP TABLE IF EXISTS NamingPattern;
-        CREATE TABLE NamingPattern(pattern TXT);
-        INSERT INTO NamingPattern (pattern) VALUES ("${this.props.namePattern}");`;
 
     // create async sqlite3 operation
     db.query = function (sql) {
@@ -75,6 +64,10 @@ class Progress extends Component {
     // store naming pattern in the db
     (async () => {
       try {
+        const sql = `DROP TABLE IF EXISTS NamingPattern;
+        CREATE TABLE NamingPattern(pattern TXT);
+        INSERT INTO NamingPattern (pattern) VALUES ("${this.props.namePattern}");`;
+
         await db.query(sql);
         db.close();
       } catch (e) {
@@ -83,10 +76,12 @@ class Progress extends Component {
     })();
 
     let app_path = remote.app.getAppPath();
+
     // If true, we are in a packaged environment
-    if(app_path.split(path.sep).pop().includes("asar")) {
-      app_path = path.join(app_path, "..");
+    if (app_path.split(path.sep).pop().includes('asar')) {
+      app_path = path.join(app_path, '..');
     }
+
     const python_dist = path.join(app_path, 'python', 'dist');
     const exe_names = ['crop_images', 'ocr_predict_gpu', 'fuzzy_search'];
     const filepaths = exe_names.map((x) => {
@@ -94,72 +89,115 @@ class Progress extends Component {
     });
     console.log(`propboi=${this.props.projectPath}`);
 
-    const crop_process = spawn(filepaths[0], [
-      this.props.photosPath,
-      this.props.projectPath,
-      this.props.dbPath,
-      "--padding",
-      this.props.padSize,
-    ],
-    {
-      cwd: path.join(filepaths[0], ".."),
-      // stdio: ['ignore', process.stdout, process.stderr],
-    });
-    crop_process.stdout.on('data', (data) => {
-      console.log(`crop stdout: ${data}`);
-    });
-    crop_process.stderr.on('data', (data) => {
-      console.warn(`crop err: ${data}`);
-    });
-    crop_process.on('close', (code) => {
-      if (code !== 0) {
-        console.error('Cropping portion failed.');
-        return;
-      }
-      console.log('Success!!!!!');
-      const ocr_process = spawn(filepaths[1], [
-        this.props.projectPath,
-        this.props.dbPath,
-      ],{
-        cwd: path.join(filepaths[1], ".."),
-      });
-      ocr_process.stdout.on('data', (data) => {
-        console.log(`ocr stdout: ${data}`);
-      });
-      ocr_process.stderr.on('data', (data) => {
-        console.warn(`ocr err: ${data}`);
-      });
-      ocr_process.on('close', (code) => {
-        if (code !== 0) {
-          console.error('OCR portion failed.');
-          return;
-        }
-        console.log('Success2!!!!!');
-        const fuzz_process = spawn(filepaths[2], [
-          this.props.csvPath,
-          this.props.dbPath,
-        ],{
-          cwd: path.join(filepaths[2], ".."),
+    const run_crop = () => {
+      return new Promise((resolve, reject) => {
+        // spawn new process for cropping
+        const crop_process = spawn(
+          filepaths[0],
+          [
+            this.props.photosPath,
+            this.props.projectPath,
+            this.props.dbPath,
+            '--padding',
+            this.props.padSize,
+          ],
+          {
+            cwd: path.join(filepaths[0], '..'),
+            // stdio: ['ignore', process.stdout, process.stderr],
+          },
+        );
+
+        // print stdout stream
+        crop_process.stdout.on('data', (data) => {
+          console.log(`crop stdout: ${data}`);
         });
+
+        // print stderr stream
+        crop_process.stderr.on('data', (data) => {
+          console.warn(`crop err: ${data}`);
+        });
+
+        // handle exit
+        crop_process.on('close', (code) => {
+          if (code === 0) {
+            resolve('Cropping Finished Successfully');
+          } else {
+            reject('Cropping Failed!');
+          }
+        });
+      });
+    };
+
+    const run_ocr = () => {
+      return new Promise((resolve, reject) => {
+        // spawn new process for OCR
+        const ocr_process = spawn(filepaths[1], [this.props.projectPath, this.props.dbPath], {
+          cwd: path.join(filepaths[1], '..'),
+        });
+
+        // print stdout stream
+        ocr_process.stdout.on('data', (data) => {
+          console.log(`ocr stdout: ${data}`);
+        });
+
+        // print stderr stream
+        ocr_process.stderr.on('data', (data) => {
+          console.warn(`ocr err: ${data}`);
+        });
+
+        // handle exit
+        ocr_process.on('close', (code) => {
+          if (code === 0) {
+            resolve('OCR Finished Successfully');
+          } else {
+            reject('OCR Failed!');
+          }
+        });
+      });
+    };
+
+    const run_fuzz = () => {
+      return new Promise((resolve, reject) => {
+        // spawn new process for cropping
+        const fuzz_process = spawn(filepaths[2], [this.props.csvPath, this.props.dbPath], {
+          cwd: path.join(filepaths[2], '..'),
+        });
+
+        // print stdout stream
         fuzz_process.stdout.on('data', (data) => {
           console.log(`fuzz stdout: ${data}`);
         });
+
+        // print stderr stream
         fuzz_process.stderr.on('data', (data) => {
           console.warn(`fuzz err: ${data}`);
         });
+
+        // handle exit
         fuzz_process.on('close', (code) => {
-          if (code !== 0) {
-            console.error('Fuzzy Search portion failed.');
-            return;
+          if (code === 0) {
+            resolve('Fuzzy Search Finished Successfully');
+          } else {
+            reject('Fuzzy Search Failed!');
           }
-          console.log('Success3!!!!!');
-          this.handleProgress();
         });
       });
-    });
+    };
 
-    // const mycolnames = await database_actions;
-    // console.log(mycolnames);
+    // run each component
+    (async () => {
+      try {
+        const res1 = await run_crop();
+        console.log(res1);
+        const res2 = await run_ocr();
+        console.log(res2);
+        const res3 = await run_fuzz();
+        console.log(res3);
+        this.handleProgress();
+      } catch (e) {
+        return console.error(e);
+      }
+    })();
   }
 
   render() {

@@ -9,7 +9,7 @@ import tarfile
 import copy
 import sys
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '4'
 
 import textwrap
@@ -35,9 +35,9 @@ FOND_PATH = './STXINWEI.TTF'
 def init_ocr_model(rec_path, det_path):
     detection_pb = det_path
     recognition_pb = rec_path
-    with tf.device('/cpu:0'):
+    with tf.device('/gpu:0'):
 
-        tf_config = tf.ConfigProto(device_count = {'GPU': 0}, allow_soft_placement=True)
+        tf_config = tf.ConfigProto(gpu_options = tf.GPUOptions(allow_growth = True), allow_soft_placement = True, log_device_placement = False)
 
         detection_model = TextDetection(detection_pb, tf_config, max_size=1600)
         recognition_model = TextRecognition(recognition_pb, seq_len=27, config=tf_config)
@@ -158,12 +158,8 @@ def detection(img_path, detection_model, recognition_model, label_dict, is_video
             image_padded = np.float32(image_padded) / 255.
 
         image_padded = np.expand_dims(image_padded, 0)
-        #print(image_padded.shape)
 
         results, probs = recognition_model.predict(image_padded, label_dict, EOS='EOS')
-        #print(results)
-        #print(''.join(results))
-        #print(probs)
 
         results = ''.join(results).replace('#', '')
 
@@ -174,9 +170,7 @@ def detection(img_path, detection_model, recognition_model, label_dict, is_video
         pts = list(ccw_polygon.exterior.coords)[:-1]
         vis_image = draw_annotation(vis_image, pts, ''.join(results))
 
-    #print(' '.join(words))
     retval = (' '.join(words), ' '.join([str(c) for c in confidences]), img_path)
-    #print(retval)
 
     return vis_image, retval
 
@@ -242,7 +236,7 @@ if __name__ == '__main__':
             logging.info("Successfully processed: {}. Results: {}".format(filename, ocr_output[0]))
         
         except:
-            logging.error("Something went wrong when processing the file '{}'. Ensure you've supplied the proper filepath or that the file is an image and try again.".format(filename))
+            logging.error("Something went wrong when processing the file '{}'. Ensure you've supplied the proper filepath. If this is not an image, disregard this warning.".format(filename))
 
     duration = time() - start
 

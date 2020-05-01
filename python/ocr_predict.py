@@ -49,10 +49,10 @@ def init_ocr_model(rec_path, det_path):
     label_dict = np.load('./reverse_label_dict_with_rects.npy', allow_pickle = True)[()] # reverse_label_dict_with_rects.npy  reverse_label_dict
     return detection_model, recognition_model, label_dict 
 
-def predict_ocr_image(img_dir, filename, ocr_detection_model, ocr_recognition_model, ocr_label_dict):
+def predict_ocr_image(img_dir, filename, save_dir, ocr_detection_model, ocr_recognition_model, ocr_label_dict):
 
     img_path = os.path.join(img_dir, filename)
-    save_path = os.path.join('output', filename)
+    save_path = os.path.join(save_dir, filename)
 
     image, output = detection(img_path, ocr_detection_model, ocr_recognition_model, ocr_label_dict)
     cv2.imwrite(save_path, image)
@@ -74,10 +74,10 @@ def order_points(pts):
     return pts_sorted
 
 
-def draw_annotation(image, points, label, horizon=True, vis_color=(30,255,255)):#(30,255,255)
+def draw_annotation(image, points, label, horizon=True, vis_color=(255, 0, 0)):#(30,255,255)
     points = np.asarray(points)
     points = np.reshape(points, [-1, 2])
-    cv2.polylines(image, np.int32([points]), 1, (0, 255, 0), 2)
+    cv2.polylines(image, np.int32([points]), 1, (255, 0, 0), 2)
 
     image = Image.fromarray(image)
     width, height = image.size
@@ -162,12 +162,8 @@ def detection(img_path, detection_model, recognition_model, label_dict, it_is_vi
             image_padded = np.float32(image_padded) / 255.
 
         image_padded = np.expand_dims(image_padded, 0)
-        #print(image_padded.shape)
 
         results, probs = recognition_model.predict(image_padded, label_dict, EOS='EOS')
-        #print(results)
-        #print(''.join(results))
-        #print(probs)
 
         results = ''.join(results).replace('#', '')
 
@@ -178,9 +174,7 @@ def detection(img_path, detection_model, recognition_model, label_dict, it_is_vi
         pts = list(ccw_polygon.exterior.coords)[:-1]
         vis_image = draw_annotation(vis_image, pts, ''.join(results))
 
-    #print(' '.join(words))
     retval = (' '.join(words), ' '.join([str(c) for c in confidences]), img_path)
-    #print(retval)
 
     return vis_image, retval
 
@@ -195,31 +189,17 @@ def update(db, pipeline_output):
     c = conn.cursor()
 
     # update cropped images to include OCR output
-    #print(pipeline_output)
     
     for output in pipeline_output:
-
-        #c.execute("SELECT * FROM crop_path WHERE crop_path = {}".format(output[2]))
         c.execute(f'Update PipelineResults set ocr_results = "{output[0]}", confidence = "{output[1]}" where crop_path = "{output[2]}"')
-        #c.execute('Update PipelineResults set ocr_results = (?), confidence = (?) where crop_path = (?)'.format(), output)
         conn.commit()
-    
-    #output = pipeline_output[0]
-    #print('INPUT IMAGE PATH: ', output[2])
-    #c.execute(f'Update PipelineResults set ocr_results = "{output[0]}", confidence = "{output[1]}" where crop_path = "{output[2]}"')
 
-    #c.executemany('UPDATE PipelineResults SET ocr_results = (?), confidence = (?) WHERE crop_path = ?', pipeline_output)
-    #conn.commit()
-
-    # close out db
     c.close()
 
 import logging
 from optparse import OptionParser
 
 if __name__ == '__main__':
-    # os.environ["TF_ENABLE_CONTROL_FLOW_V2"] = "0"
-    #app.run(host='0.0.0.0', debug=True)
     '''
     parser = ArgumentParser()
 
@@ -234,12 +214,13 @@ if __name__ == '__main__':
     os.makedirs('logs', exist_ok = True)
     logging.basicConfig(filename = "logs/ocr.log", level = logging.DEBUG, format = "%(levelname)s: %(message)s")
 
-    if len(sys.argv) == 3:
+    if len(sys.argv) == 4:
         try:
             img_dir = sys.argv[1]
             db_path = sys.argv[2]
+            project_path = sys.argv[3]
         except:
-            logging.error("One or more arguments missing. Make sure you've supplied an image directory and database path.")
+            logging.error("One or more arguments missing. Make sure you've supplied a valid image directory, database path, and project folder.")
             sys.exit()
     
     else:
@@ -251,7 +232,9 @@ if __name__ == '__main__':
 
     ocr_detection_model, ocr_recognition_model, ocr_label_dict = init_ocr_model(rec_model_path, det_model_path)
 
-    os.makedirs('output', exist_ok = True)
+    vis_save_dir = os.path.join(project_path, "ocr_output", "")
+
+    os.makedirs(vis_save_dir, exist_ok = True)
 
     db_output = []
 
@@ -260,7 +243,7 @@ if __name__ == '__main__':
 
     for filename in os.listdir(img_dir):
         try:
-            ocr_output = predict_ocr_image(img_dir, filename, ocr_detection_model, ocr_recognition_model, ocr_label_dict)
+            ocr_output = predict_ocr_image(img_dir, filename, vis_save_dir, ocr_detection_model, ocr_recognition_model, ocr_label_dict)
             db_output.append(ocr_output)
             logging.info("Successfully processed: {}. Results: {}".format(filename, ocr_output[0]))
         

@@ -62,6 +62,7 @@ class EditWrap extends Component {
     // open db
     const db = new sqlite3.Database(this.state.dbPath, sqlite3.OPEN_READWRITE);
 
+    // create async sqlite3 operation
     db.query = function (sql) {
       const that = this;
       return new Promise((resolve, reject) => {
@@ -137,18 +138,18 @@ class EditWrap extends Component {
     (async () => {
       try {
         await db.query(sql);
+        db.close();
       } catch (e) {
         return console.log(e);
       }
     })();
-
-    db.close();
   };
 
   getData = (index) => {
     // open db
     const db = new sqlite3.Database(this.state.dbPath, sqlite3.OPEN_READWRITE);
 
+    // create async sqlite3 operation
     db.query = function (sql) {
       const that = this;
       return new Promise((resolve, reject) => {
@@ -185,13 +186,12 @@ class EditWrap extends Component {
         newState['imgPath'] = imgPath;
         newState['index'] = index;
 
+        db.close();
         this.setState(newState);
       } catch (e) {
         return console.log(e);
       }
     })();
-
-    db.close();
   };
 
   onNext = () => {
@@ -250,42 +250,49 @@ class EditWrap extends Component {
   };
 
   componentDidMount() {
+    // add key-bindings
     document.addEventListener('keydown', this.handleKeyDown);
+
     // open db
     const db = new sqlite3.Database(this.state.dbPath, sqlite3.OPEN_READONLY);
 
-    // find number of rows and store into max
-    db.all('SELECT (Count(_rowid_) -1) as MAX_VAL FROM MatchedResults', (err, data) => {
-      if (err) {
-        console.log(err);
-        return;
-      }
-
-      this.setState({
-        max: data[0].MAX_VAL,
+    // create async sqlite3 operation
+    db.query = function (sql) {
+      const that = this;
+      return new Promise((resolve, reject) => {
+        that.all(sql, (err, data) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(data);
+          }
+        });
       });
-    });
+    };
 
-    // query column names to display
-    db.all('PRAGMA table_info(CSVData);', (err, cols) => {
-      const index = parseInt(this.state.index);
+    (async () => {
+      try {
+        // find number of rows and store into max
+        let sql = 'SELECT (Count(_rowid_) -1) as MAX_VAL FROM MatchedResults';
+        let tmp = await db.query(sql);
+        const max = tmp[0].MAX_VAL;
 
-      // extract names of columns
-      let colNames = cols.map((x) => x.name);
-      // remove index from column name list
-      colNames = colNames.slice(1);
+        // find column names
+        sql = 'PRAGMA table_info(CSVData);';
+        tmp = await db.query(sql);
 
-      // generate sql query for values
-      const sql = `SELECT ${colNames.join()},crop_path FROM MatchedResults LIMIT 1 OFFSET ${index}`;
+        const index = parseInt(this.state.index);
 
-      // query db
-      db.all(sql, (err, data) => {
-        if (err) {
-          console.log('error: ' + err);
-          return;
-        }
+        // extract column names & remove index from list
+        let colNames = tmp.map((x) => x.name);
+        colNames = colNames.slice(1);
 
-        const tmp = data[0];
+        // find values for columns at current index
+        sql = `SELECT ${colNames.join()},crop_path FROM MatchedResults LIMIT 1 OFFSET ${index}`;
+        tmp = await db.query(sql);
+
+        // shorten access
+        tmp = tmp[0];
         const imgPath = tmp['crop_path'];
         delete tmp['crop_path'];
 
@@ -298,12 +305,14 @@ class EditWrap extends Component {
         newState['colNames'] = colNames;
         newState['imgPath'] = imgPath;
         newState['index'] = index;
+        newState['max'] = max;
 
+        db.close();
         this.setState(newState);
-      });
-    });
-
-    db.close();
+      } catch (e) {
+        return console.error(e);
+      }
+    })();
   }
 
   componentWillUnmount() {

@@ -76,13 +76,11 @@ class Progress extends Component {
     (async () => {
       try {
         await db.query(sql);
+        db.close();
       } catch (e) {
         return console.log(e);
       }
     })();
-
-    // close db when done
-    db.close();
 
     let app_path = remote.app.getAppPath();
     // If true, we are in a packaged environment

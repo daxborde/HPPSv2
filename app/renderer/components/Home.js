@@ -75,7 +75,7 @@ class Home extends Component {
       const sql = 'SELECT pattern from NamingPattern WHERE _rowid_ = 1';
 
       // create async sqlite3 operation
-      db.query = function(sql) {
+      db.query = function (sql) {
         const that = this;
         return new Promise((resolve, reject) => {
           that.all(sql, (err, data) => {
@@ -94,6 +94,7 @@ class Home extends Component {
           const result = await db.query(sql);
           const pattern = result[0]['pattern'];
 
+          db.close();
           this.props.onOpenProject({
             namePattern: pattern,
             projectPath: projectPath,

@@ -49,18 +49,19 @@ class Edit extends Component {
     const list = (x) => {
       if (x === null) return null;
 
-      return x.map((x, index) => (
-        <CustomTextField
-          key={index}
-          label={x}
-          name={x}
-          type='text'
-          // autoFocus={index === 0}
-          defaultValue={this.props[x]}
-          className={classes.item}
-          onBlur={this.props.handleChange}
-        />
-      ));
+      return x.map((x, index) => {
+        return(
+          <CustomTextField
+            key={`${index}+${this.props[x]}`}
+            label={x}
+            name={x}
+            type='text'
+            // autoFocus={index === 0}
+            defaultValue={this.props[x]}
+            className={classes.item}
+            onBlur={this.props.handleChange}
+          />
+        )});
     };
 
     return (

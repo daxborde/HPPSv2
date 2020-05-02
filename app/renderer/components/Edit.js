@@ -5,6 +5,8 @@ import CustomTextField from './CustomTextField';
 import CustomButton from './CustomButton';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
 import Card from '@material-ui/core/Card';
 
 const styles = (theme) => ({
@@ -66,6 +68,33 @@ class Edit extends Component {
 
     return (
       <Template title='Review'>
+        <Snackbar
+          open={this.props.manyerror}
+          autoHideDuration={6000}
+          key='manyerror'
+          onClose={this.props.clearManyError}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right',
+          }}>
+          <MuiAlert elevation={6} variant='filled' onClose={this.props.clearManyError} severity='error'>
+            More than one search result!
+          </MuiAlert>
+        </Snackbar>
+        <Snackbar
+          open={this.props.emptyerror}
+          autoHideDuration={6000}
+          key='emptyerror'
+          onClose={this.props.clearEmptyError}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right',
+          }}>
+          <MuiAlert elevation={6} variant='filled' onClose={this.props.clearEmptyError} severity='error'>
+            No search results!
+          </MuiAlert>
+        </Snackbar>
+
         <div className={classes.wrapper}>
           <div key={this.props.imgPath} className={classes.photo}>
             <Card

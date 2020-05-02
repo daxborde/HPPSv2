@@ -421,6 +421,8 @@ class EditWrap extends Component {
     return (
       <Edit
         {...this.state}
+        clearManyError={this.clearManyError}
+        clearEmptyError={this.clearEmptyError}
         onPrevious={this.onPrevious}
         onNext={this.onNext}
         handleFinish={this.handleOnFinish}

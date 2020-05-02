@@ -89,7 +89,7 @@ pyinstaller ocr_predict.py --hidden-import tensorpack.tfutils.optimizer
 
 Note that, in the resulting distribution folder (found in `dist/ocr_predict` or `dist/ocr_predict_gpu`), you must also include the 4 files mentioned in step 3.
 
-### Running the OCR module
+#### Running the OCR module
 
 Run the OCR using the following command:
 

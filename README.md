@@ -1,20 +1,9 @@
-# electron-react-redux-boilerplate
-[![Build Status](https://api.travis-ci.org/jschr/electron-react-redux-boilerplate.svg)](https://travis-ci.org/jschr/electron-react-redux-boilerplate)
-[![dependencies Status](https://david-dm.org/jschr/electron-react-redux-boilerplate/status.svg)](https://david-dm.org/jschr/electron-react-redux-boilerplate)
-[![devDependencies Status](https://david-dm.org/jschr/electron-react-redux-boilerplate/dev-status.svg)](https://david-dm.org/jschr/electron-react-redux-boilerplate?type=dev)
+# Headstone Photo Processing System
 
-A minimal boilerplate to get started with [Electron](http://electron.atom.io/), [React](https://facebook.github.io/react/) and [Redux](http://redux.js.org/).
-
-Including:
-
-* [React Router](https://reacttraining.com/react-router/)
-* [Redux Thunk](https://github.com/gaearon/redux-thunk/)
-* [Redux Actions](https://github.com/acdlite/redux-actions/)
-* [Redux Local Storage](https://github.com/elgerlambert/redux-localstorage/)
-* [Electron Packager](https://github.com/electron-userland/electron-packager)
-* [Electron DevTools Installer](https://github.com/MarshallOfSound/electron-devtools-installer)
-* [Electron Mocha](https://github.com/jprichardson/electron-mocha)
-* [Browsersync](https://browsersync.io/)
+## Important User Notes
+- All column names in CSV should have no spaces or dashes
+- The first three columns should be Given, Middle, and Surname
+- Pixel Border should not be left blank
 
 ## Quick start
 
@@ -42,6 +31,7 @@ Toggle DevTools:
 * Linux: <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>I</kbd> or <kbd>F12</kbd>
 * Windows: <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>I</kbd> or <kbd>F12</kbd>
 
+
 ## Packaging
 
 Modify [electron-builder.yml](./electron-builder.yml) to edit package info.
@@ -56,19 +46,10 @@ npm run pack:win
 npm run pack:linux
 ```
 
-## Tests
-
-```
-npm run test
-```
-
 ## Maintainers
 
-- [@jschr](https://github.com/jschr)
-- [@pronebird](https://github.com/pronebird)
-
-## Apps using this boilerplate
-
-- [Mullvad VPN app](https://github.com/mullvad/mullvadvpn-app)
-- [YouTube Downloader Electron](https://github.com/vanzylv/youtube-downloader-electron)
-- [Martian: A Websocket test tool](https://github.com/drex44/martian)
+- [@daxborde](https://github.com/daxborde)
+- [@afranco20](https://github.com/afranco20)
+- [@minhp4801](https://github.com/minhp4801)
+- [@kobeeraveendran](https://github.com/kobeeraveendran)
+- [@sschilke](https://github.com/sschilke)

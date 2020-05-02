@@ -1,9 +1,10 @@
 # Headstone Photo Processing System
+A Senior Design project created for Dr. Amy Giroux to facilitate the processing of headstone photos. Leveraging Convolutional Neural Networks (CNNs), this application automatically crops, rotates, and extracts text from images of headstones (optical character recognition, or OCR). The results are then automatically matched with the CSV annotation data provided by the user, then queued for manual review.
 
 ## Important User Notes
 - All column names in CSV should have no spaces or dashes
-- The first three columns should be Given, Middle, and Surname
-- Pixel Border should not be left blank
+- The first three columns in CSV should be GivenName, MiddleName, and Surname
+- Pixel Border should not be left blank (For no padding, input 0)
 
 ## Quick start
 

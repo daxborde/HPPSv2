@@ -1,25 +1,48 @@
 # Headstone Photo Processing System
-A Senior Design project created for Dr. Amy Giroux to facilitate the processing of headstone photos. Leveraging Convolutional Neural Networks (CNNs), this application automatically crops, rotates, and extracts text from images of headstones (optical character recognition, or OCR). The results are then automatically matched with the CSV annotation data provided by the user, then queued for manual review.
+
+![GitHub](https://img.shields.io/github/license/daxborde/HPPSv2)
+![David](https://img.shields.io/david/daxborde/HPPSv2)
+![David](https://img.shields.io/david/dev/daxborde/HPPSv2)
+
+## Description
+
+A Senior Design project created for Dr. Amy Giroux to facilitate the processing of headstone photos.
+Leveraging Convolutional Neural Networks (CNNs), this application automatically crops, rotates, and
+extracts text from images of headstones (optical character recognition, or OCR). The results are
+then automatically matched with the CSV annotation data provided by the user, then queued for manual
+review.
+
+### Built With
+
+- Electron
+- React
+- Redux
+- TensorFlow
+- SQLite
 
 ## Important User Notes
+
 - All column names in CSV should have no spaces or dashes
-- The first three columns in CSV should be GivenName, MiddleName, and Surname
-- Pixel Border should not be left blank (For no padding, input 0)
+- The first three columns in CSV should be: Given, Middle, and Surname
+- For no pixel border input 0 (default is 15)
 
 ## Quick start
 
 Clone the repository
+
 ```bash
-git clone --depth=1 git@github.com:jschr/electron-react-redux-boilerplate.git
+git clone https://github.com/daxborde/HPPSv2.git
 ```
 
 Install dependencies
+
 ```bash
-cd electron-react-redux-boilerplate
+cd HPPSv2
 npm install
 ```
 
 Development
+
 ```bash
 npm run develop
 ```
@@ -28,10 +51,9 @@ npm run develop
 
 Toggle DevTools:
 
-* macOS: <kbd>Cmd</kbd> <kbd>Alt</kbd> <kbd>I</kbd> or <kbd>F12</kbd>
-* Linux: <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>I</kbd> or <kbd>F12</kbd>
-* Windows: <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>I</kbd> or <kbd>F12</kbd>
-
+- macOS: <kbd>Cmd</kbd> <kbd>Alt</kbd> <kbd>I</kbd> or <kbd>F12</kbd>
+- Linux: <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>I</kbd> or <kbd>F12</kbd>
+- Windows: <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>I</kbd> or <kbd>F12</kbd>
 
 ## Packaging
 
@@ -54,3 +76,7 @@ npm run pack:linux
 - [@minhp4801](https://github.com/minhp4801)
 - [@kobeeraveendran](https://github.com/kobeeraveendran)
 - [@sschilke](https://github.com/sschilke)
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)

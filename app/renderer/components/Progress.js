@@ -88,7 +88,7 @@ class Progress extends Component {
       app_path = path.join(app_path, "..");
     }
     const python_dist = path.join(app_path, 'python', 'dist');
-    const exe_names = ['crop_images', 'ocr_predict_gpu', 'fuzzy_search'];
+    const exe_names = ['crop_images', 'ocr_predict', 'fuzzy_search'];
     const filepaths = exe_names.map((x) => {
       return path.join(python_dist, x, x);
     });

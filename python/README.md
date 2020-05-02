@@ -24,7 +24,7 @@ mask-rcnn (https://github.com/matterport/Mask_RCNN)
 2. Create conda environments corresponding to the version you wish to set up (CPU or GPU):
 
 <details>
-<summary>#### CPU</summary>
+<summary>CPU</summary>
 
 ```
 conda create -f cpu-environment.yml`
@@ -46,7 +46,7 @@ conda create -f cpu-environment-full.yml
 </details>
 
 <details>
-<summary>#### GPU</summary>
+<summary>GPU</summary>
 
 ```
 conda create -f gpu-environment.yml

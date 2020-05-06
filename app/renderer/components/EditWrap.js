@@ -145,6 +145,93 @@ class EditWrap extends Component {
     })();
   };
 
+  searchData = (cols) => {
+    // get cols from state
+    const colNames = this.state.colNames.map((x) => '"'+x+'"');
+    const qCols = cols.map((x) => '"'+x+'"');
+
+    // const qColNames = colNames.;
+
+    // sql query
+    const sqlprefix = `SELECT ${colNames} FROM CSVData WHERE `;
+    const sqltermsarr = [...Array(3).keys()].map((x) => {
+      if(qCols[x] === '""') return "";
+      return `${colNames[x]}=${qCols[x]}`;
+    }).filter((x) => x.length !== 0);
+
+    if (sqltermsarr.length < 1) {
+      console.error("Error, no search terms.");
+    }
+
+    const sqlsuffix = sqltermsarr.join(" AND ");
+    const sql = sqlprefix + sqlsuffix;
+    // `${colNames[0]}=${qCols[0]} AND ${colNames[1]}=${qCols[1]} `+
+    // `AND ${colNames[2]}=${qCols[2]}`;
+
+    // open db
+    const db = new sqlite3.Database(this.state.dbPath, sqlite3.OPEN_READWRITE);
+
+    // create async sqlite3 operation
+    db.query = function (sql) {
+      const that = this;
+      return new Promise((resolve, reject) => {
+        that.all(sql, (err, data) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(data);
+          }
+        });
+      });
+    };
+
+    // async query db
+    (async () => {
+      try {
+        const data = await db.query(sql);
+        console.log(`data=${JSON.stringify(data)}`);
+        console.log(`len=${data.length}`);
+
+        if (data.length > 1) {
+          this.setState({"manyerror": true});
+          console.error("Error, ambiguous search.");
+          return;
+        } else if (data.length < 1) {
+          this.setState({"emptyerror": true});
+          console.error("Error, no results from search.");
+          return;
+        }
+        const row = data[0];
+        const newState = {};
+        const keys = Object.keys(row);
+        for (const key of keys) {
+          newState[key] = row[key];
+        }
+
+        db.close();
+        this.setState(newState);
+      } catch (e) {
+        console.log(e);
+        return;
+      }
+    })();
+
+    console.log(`colNames="${colNames}"`);
+    console.log(`qColNames="${colNames}"`);
+    console.log(`cols="${qCols}"`);
+    console.log(`sql="${sql}"`);
+  }
+
+  clearManyError = () => {
+    console.log("clearManyError");
+    this.setState({"manyerror": false});
+  };
+
+  clearEmptyError = () => {
+    console.log("clearEmptyError");
+    this.setState({"emptyerror": false});
+  };
+
   getData = (index) => {
     // open db
     const db = new sqlite3.Database(this.state.dbPath, sqlite3.OPEN_READWRITE);
@@ -233,13 +320,20 @@ class EditWrap extends Component {
     }
 
     switch (keyCode) {
+      // Left arrow key
       case 37:
         if (disable_prev) return;
         this.onPrevious();
         break;
+      // Right arrow key
       case 39:
         if (disable_next) return;
         this.onNext();
+        break;
+      // J key
+      case 74:
+        if (disable_next) return;
+        this.searchData(this.getColvals());
         break;
     }
   };
@@ -327,6 +421,8 @@ class EditWrap extends Component {
     return (
       <Edit
         {...this.state}
+        clearManyError={this.clearManyError}
+        clearEmptyError={this.clearEmptyError}
         onPrevious={this.onPrevious}
         onNext={this.onNext}
         handleFinish={this.handleOnFinish}

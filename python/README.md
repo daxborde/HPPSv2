@@ -108,9 +108,3 @@ python ocr_predict_gpu.py path_to_image_folder path_to_db.sqlite3
 OCR output will be printed in the logs at `logs/ocr.log`, and annotations are available in `ocr_output` in the image directory you've specified.
 
 Either script can also be run without a database by supplying no command-line arguments, but this requires all images be in `./image/`; that is, a folder `image` in the same directory as the script. Annotations will now instead be in `image/ocr_output/`.
-
-## Packaged Installers (Windows)
-
-GPU: https://drive.google.com/file/d/1tabrGq68dJuURxJR_vou7J0T9N4Y98vQ/view?usp=sharing
-
-CPU: https://drive.google.com/file/d/13YebPlS-tRe4l0ORMfLnC5YFld6WTRDH/view?usp=sharing
